@@ -7,7 +7,7 @@ HotKeySet("{TAB}", "PauseUnpause")
 ;
 Dim Const $cCharType               = $cctDW; Задаём тип нашего персонажа
 ;~ Dim Const $cCharType               = $cctElf; Задаём тип нашего персонажа
-Dim Const $cPassword               = "wdtnjxtr21" ; Пароль к акку
+Dim Const $cPassword               = "#######" ; Пароль к акку
 ;~ Dim Const $cCharNumber             = 1 ; Номер нашего персонажа на экране выбора
 Dim Const $cCharNumber             = 4 ; Номер нашего персонажа на экране выбора
 
