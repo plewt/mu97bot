@@ -704,8 +704,10 @@ EndFunc
 ; $aCanTeleport - Можно ли телепортироваться
 ;-----------------------------------------------
 Func GoToCoord($aToCoords, $aCanTeleport = 0, $aCenterMouse = True)
+	Local Const $GoToValues[8] = [1, 0, 10, 20, 21, 22, 12, 2]
+
 	Local $curCoords = GetCurrentPos()
-	Local $prevCurCoords[2] = [-1, -1] ;GetCurrentPos()
+	Local $prevCurCoords[2] = [-1, -1]
 	Local $multiplier = 1
 	Local $MaxGotoIter = 2 * (Abs($curCoords[0] - $aToCoords[0]) + Abs($curCoords[1] - $aToCoords[1]))
 	If $MaxGotoIter == 0 Then Return
@@ -719,42 +721,18 @@ Func GoToCoord($aToCoords, $aCanTeleport = 0, $aCenterMouse = True)
 		$MDx = 0
 		$MDy = 0
 
-		If isDead() Then
-			ExitLoop
-		EndIf
+		If isDead() Then ExitLoop
 
 		Local $GoToPos = 0
-		Local $TempValues[8] = [1, 0, 10, 20, 21, 22, 12, 2]
 
 		Local $AddX = 0
 		Local $AddY = 0
-		If $curCoords[0] <> $aToCoords[0] Then
-			$AddX = ($aToCoords[0] - $curCoords[0])/ Abs($aToCoords[0] - $curCoords[0])
-		EndIf
-		If $curCoords[1] <> $aToCoords[1] Then
-			$AddY = -($aToCoords[1] - $curCoords[1])/ Abs($aToCoords[1] - $curCoords[1])
-		EndIf
-
-		; 1(-1 , -1) 2( 0 , -1) 3( 1, -1)
-		; 0(-1 ,  0)           4( 1,  0)
-		; 7(-1 ,  1) 6( 0 ,  1) 5( 1,  1)
-
-;~ 		    0  1  2  3  4  5  6  7
-;~ 		x  -1  0  1  1  1  0 -1 -1
-;~ 		y  -1 -1 -1  0  1  1  1  0
-
-;~ 		   0  1  2  3  4  5  6  7
-;~ 		x -1 -1  0  1  1  1  0 -1
-;~ 		y  0 -1 -1 -1  0  1  1  1
-
-;~ 		   0  1  2  3  4  5  6  7
-;~ 		x -1 -1  0  1  1  1  0 -1
-;~ 		   0  0  1  1  1  1  2  2
-;~ 		x -1 -1  0  1  1  1  0 -1
+		If $curCoords[0] <> $aToCoords[0] Then $AddX = ($aToCoords[0] - $curCoords[0])/ Abs($aToCoords[0] - $curCoords[0])
+		If $curCoords[1] <> $aToCoords[1] Then $AddY = -($aToCoords[1] - $curCoords[1])/ Abs($aToCoords[1] - $curCoords[1])
 
 		Local $SearchValue = ($AddX + 1) * 10 + ($AddY + 1)
-		For $aI = 0 To UBound($TempValues) - 1 Step 1
-			If $TempValues[$aI] == $SearchValue Then
+		For $aI = 0 To UBound($GoToValues) - 1 Step 1
+			If $GoToValues[$aI] == $SearchValue Then
 				$GoToPos = $aI
 				ExitLoop
 			EndIf
@@ -762,7 +740,6 @@ Func GoToCoord($aToCoords, $aCanTeleport = 0, $aCenterMouse = True)
 
 		If ($prevCurCoords[0] == $curCoords[0]) And ($prevCurCoords[1] == $curCoords[1]) Then
 			If $multiplier < 4 Then $multiplier += 1
-;~ 			$GoToPos = Random(0, 7, 1)
 			$curRetryIter += 1
 			$GoToPos += $curRetryIter
 			$GoToPos = Mod($GoToPos, 8)
@@ -771,19 +748,15 @@ Func GoToCoord($aToCoords, $aCanTeleport = 0, $aCenterMouse = True)
 			$curRetryIter = 0
 		EndIf
 
-;~ 		$MDx = Mod($GoToPos - 1, 4) * (Mod(Int(($GoToPos + 3)/4), 2) * 2 - 1) * $cMDelta * $multiplier
-;~ 		$MDy = Mod($GoToPos + 1, 4) * (    Int ($GoToPos     /4)     * 2 - 1) * $cMDelta * $multiplier
-;~ 		$MDx = Sign(Mod($GoToPos + 2, 4)) * (Mod(Int(($GoToPos + 2)/4), 2) * 2 - 1) * $cMDelta * $multiplier
-;~ 		$MDy = Sign(Mod($GoToPos    , 4)) * (    Int ($GoToPos     /4)     * 2 - 1) * $cMDelta * $multiplier
-;~ 		$MDx = Sign(Mod($GoToPos - 1, 4)) * (Mod(Int(($GoToPos + 3)/4), 2) * 2 - 1) * $cMDelta * $multiplier
-;~ 		$MDy = Sign(Mod($GoToPos + 1, 4)) * (    Int ($GoToPos     /4)     * 2 - 1) * $cMDelta * $multiplier
+		$multiplier = 4
+		If Abs($aToCoords[0] - $curCoords[0]) + Abs($aToCoords[1] - $curCoords[1]) < 4 Then $multiplier = Abs($aToCoords[0] - $curCoords[0]) + Abs($aToCoords[1] - $curCoords[1])
+		If $multiplier < 1 Then $multiplier = 1
+
 		$MDx = Sign(Mod($GoToPos + 3, 4)) * (Mod(Int(($GoToPos + 3)/4), 2) * 2 - 1) * ($cMDelta + $cMCorner * Sign(Mod($GoToPos + 1, 2))) * $multiplier
-		$MDy = Sign(Mod($GoToPos + 1, 4)) * (    Int ($GoToPos     /4)     * 2 - 1) * ($cMDelta + $cMCorner * Sign(Mod($GoToPos + 1, 2))) * $multiplier
+		$MDy = Sign(Mod($GoToPos + 1, 4)) * (    Int ($GoToPos     /4)     * 2 - 1) * ($cMDelta + $cMCorner * Sign(Mod($GoToPos + 1, 2))) * $multiplier * 0.7
+		ConsoleWrite(StringFormat("%d %d", $MDx, $MDy))
 
-;~ 		ConsoleWrite(@CRLF & String($AddX) & " " & String($AddY))
-;~ 		ConsoleWrite(@CRLF & String($GoToPos) )
-;~ 		ConsoleWrite(@CRLF & String($MDx) & " " & String($MDy))
-
+		$multiplier = 1
 		MouseMove($cMCenter[0] + $MDx, $cMCenter[1] + $MDy, 0)
  		Sleep(200)
 		If (GetCursorColor() <> $cgtDefaultCurColor) then
@@ -792,8 +765,6 @@ Func GoToCoord($aToCoords, $aCanTeleport = 0, $aCenterMouse = True)
 				While (GetCursorColor() <> $cgtDefaultCurColor) and ($Iteration <> 8)
 					$GoToPos += 1
 					$Iteration += 1
-;~ 					$MDx = Mod($GoToPos - 1, 4) * (Mod(Int(($GoToPos + 3)/4), 2) * 2 - 1) * $cMDelta * $multiplier
-;~ 					$MDy = Mod($GoToPos + 1, 4) * (    Int ($GoToPos     /4)     * 2 - 1) * $cMDelta * $multiplier
 					$MDx = Sign(Mod($GoToPos - 1, 4)) * (Mod(Int(($GoToPos + 3)/4), 2) * 2 - 1) * ($cMDelta + $cMCorner * Sign(Mod($GoToPos + 1, 2))) * $multiplier
 					$MDy = Sign(Mod($GoToPos + 1, 4)) * (    Int ($GoToPos     /4)     * 2 - 1) * ($cMDelta + $cMCorner * Sign(Mod($GoToPos + 1, 2))) * $multiplier
 					MouseMove($cMCenter[0] + $MDx, $cMCenter[1] + $MDy, 0)
@@ -807,12 +778,11 @@ Func GoToCoord($aToCoords, $aCanTeleport = 0, $aCenterMouse = True)
 			DoTeleport()
 		Else
 			DoMainClick(50)
-			Sleep(50)
+			Sleep($multiplier * 100)
 		EndIf
 
 		$prevCurCoords = $curCoords
 		$curCoords = GetCurrentPos()
-;~ 		ShowToolTip("X : " & $curCoords[0] & @CRLF & "Y : " & $curCoords[1])
 		$curIter += 1
 	Until (($curCoords[0] == $aToCoords[0]) And ($curCoords[1] == $aToCoords[1])) Or ($curIter == $MaxGotoIter)
 	if $aCenterMouse Then CenterMouse()
