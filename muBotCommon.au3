@@ -1,11 +1,13 @@
 ;-------------------------------------
 ; Библиотека полезных функций для бота
 ;-------------------------------------
+#include-once
 #include <Math.au3>
 #include <Color.au3>
 #Include <Array.au3>
 #Include <String.au3>
 #include <Tesseract.au3>
+#include <A-Star.au3>
 Opt("MouseCoordMode", 2)
 Opt("PixelCoordMode", 2)
 ;
@@ -42,28 +44,6 @@ Dim Const $cCoordDigitsYHisto[$cDigitCount][8] =   [[0, 0,  0, 0, 0,  0,  0,  0]
 													[1, 4,  7, 9,  5,  4,  2,  1], _
 													[5, 10, 5, 3,  5,  10, 8,  0], _
 													[5, 9,  5, 3,  5,  11, 9,  3]]
-;~ Dim Const $cCoordDigitsXHisto[$cDigitCount][12] = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
-;~                                                    [6, 5, 5, 5, 4, 4, 4, 4, 5, 4, 6, 4], _
-;~                                                    [2, 3, 4, 4, 2, 2, 2, 2, 2, 2, 2, 2], _
-;~                                                    [6, 6, 4, 2, 2, 3, 2, 2, 3, 2, 8, 8], _
-;~                                                    [6, 4, 6, 3, 3, 3, 2, 2, 3, 5, 6, 4], _
-;~                                                    [3, 3, 3, 4, 6, 5, 6, 8, 8, 3, 3, 3], _
-;~                                                    [7, 3, 2, 2, 8, 4, 2, 2, 3, 5, 6, 4], _
-;~                                                    [5, 5, 5, 2, 8, 5, 4, 4, 4, 5, 6, 5], _
-;~                                                    [8, 2, 2, 3, 2, 1, 2, 1, 1, 1, 2, 2], _
-;~                                                    [6, 4, 5, 4, 4, 5, 5, 5, 5, 5, 6, 3], _
-;~                                                    [6, 6, 5, 4, 5, 6, 6, 2, 2, 6, 6, 4]]
-;~ Dim Const $cCoordDigitsYHisto[$cDigitCount][8] = [[0, 0,  0, 0, 0,  0,  0,  0], _
-;~                                                   [7, 11, 8, 3, 3,  4,  11, 9], _
-;~                                                   [0, 1,  2, 2, 12, 12, 0,  0], _
-;~                                                   [4, 7,  7, 5, 5,  7,  8,  5], _
-;~                                                   [2, 6,  6, 4, 3,  8,  10, 8], _
-;~                                                   [3, 5,  5, 4, 12, 12, 12, 2], _
-;~                                                   [2, 9,  9, 5, 3,  4,  8,  8], _
-;~                                                   [8, 10, 8, 4, 3,  5,  11, 9], _
-;~                                                   [1, 1,  3, 7, 5,  4,  4,  2], _
-;~                                                   [5, 10, 8, 4, 5,  9,  9,  3], _
-;~                                                   [5, 9,  7, 4, 5,  9,  9,  6]]
 
 ; Окружающие разряды координат прямоугольники (только 8x12)
 Dim Const $cCoordXD1[4] = [22, 742, 29, 753]
@@ -163,11 +143,20 @@ Dim Const $cctMG  = 30
 ; Общие
 Dim Const $cMuHeader               = '©WakeUp' ; Заголовок окна му
 Dim Const $cMuClass                = 'MU' ; Класс окна му
+Dim Const $cMuPath                 = "C:\\MU"
 Dim Const $cMuLauncherHeader       = 'Losena MuOnline Launcher v0.1.0.6' ; Заголовок окна лончера
 Dim Const $cMuLauncherPath         = '' ; Путь к лончеру
 Dim Const $cReconnectTryes         = 600 ; Сколько секунд ждём запуска mu
 Dim Const $cMainWndWidth           = 1024
 Dim Const $cMainWndHeight          = 768
+
+Dim Const $cgtWorldsLocs[24][2]  = [["World1", "Lorencia"], ["World2", "Dungeon"], ["World3", "Davias"], ["World4", "Noria"], _
+ 							 ["World5", "Lost Tower"], ["World7", "Arena"], ["World8", "Atlans"], ["World9", "Tarkan"], _
+							 ["World10", "Davil Square"], ["World11", "Icarus"], ["World12", "Blood Castle"], _
+							 ["World19", "Chaos Castle"], ["World25", "Kalima"], ["World34", "CryWolf"], _
+							 ["World35", "Aida"], ["World38", "Kantru"], ["World39", "Kantru 1"], ["World40", "Kantru Event"], _
+							 ["World47", "Illusion Tample"], ["World52", "Elbeland"], ["World58", "Raclion"], _
+							 ["World59", "Raclion Event"], ["World64", "Vulcano"], ["World65", "Duel Arena"]]
 
 ;
 ; Функции
@@ -697,6 +686,96 @@ Func DeclineRequest()
 EndFunc
 
 ;-----------------------------------------------
+; Получаем наименование папки по имени локации
+; Параметры:
+; $aLocationName - Наименование локации
+;-----------------------------------------------
+Func GetWorldByLocation($aLocationName)
+	For $i = 0 To UBound($cgtWorldsLocs) - 1 Step 1
+		If StringCompare($cgtWorldsLocs[$i][1], $aLocationName, False) == 0 Then Return $cgtWorldsLocs[$i][0]
+	Next
+EndFunc
+
+;-----------------------------------------------
+; Пытается перейти на коордионаты по алгоритму A*
+; Параметры:
+; $aToCoords - Куда идти - массив из 2 элементов,
+;   Y X координаты соответственно
+; $aMapName - Наименование локации в которой идём
+; $aCanTeleport - Можно ли телепортироваться
+;-----------------------------------------------
+Func GoToCoordAStar($aToCoords, $aMapName, $aCanTeleport = 0, $aCenterMouse = True)
+	$first_label = 0
+	$last_label = 0
+	$estimate = 1.001
+	$closedList_Str = "_"
+	$openList_Str = "_"
+	$barrier = _ArrayCreate(-1)
+
+	Local $StartCoord = GetCurrentPos()
+	Local $WorldName = GetWorldByLocation($aMapName)
+	Local $MyMapArray[256][256]
+	Local $MyMapFile = FileOpen($cMuPath & "\\Data\\" & $WorldName & "\\Terrain.att", 4)
+	Local $CurCharNum = 0
+	FileRead($MyMapFile, 3)
+	While 1
+		Local $CurChar = FileRead($MyMapFile, 1)
+		If @error = -1 Then ExitLoop
+
+		Local $CurY = Int($CurCharNum / 256)
+		Local $CurX = $CurCharNum - $CurY * 256
+		If Asc($CurChar) > 1 Then
+			$MyMapArray[$CurY][$CurX] = "x"
+		Else
+			$MyMapArray[$CurY][$CurX] = "0"
+		EndIf
+
+		$CurCharNum += 1
+	WEnd
+	FileClose($MyMapFile)
+
+	For $i = 0 To 255 Step 1
+		$MyMapArray[0][$i] = "x"
+		$MyMapArray[255][$i] = "x"
+	Next
+ 	For $i = 0 To 255 Step 1
+		$MyMapArray[$i][0] = "x"
+		$MyMapArray[$i][255] = "x"
+	Next
+
+	$MyMapArray[$StartCoord[1]][$StartCoord[0]] = "s"
+	$MyMapArray[$aToCoords[1]][$aToCoords[0]] = "g"
+
+	_CreateMap($MyMapArray, 256, 256)
+
+	Dim $path = _FindPath($MyMapArray, $MyMapArray[$StartCoord[1]][$StartCoord[0]], $MyMapArray[$aToCoords[1]][$aToCoords[0]])
+	Dim $goodPath = _ArrayCreate("" & $StartCoord[0] & "," & $StartCoord[1])
+	Local $aPrevCoord = $StartCoord
+	Local $PrevDX = 0
+	Local $PrevDY = 0
+	Local $aDX = 0
+	Local $aDY = 0
+	For $i = 0 To UBound($path) - 1 Step 1
+		$item = $path[$i]
+		Local $Tempo = StringSplit($item, ",")
+		Local $ToToCoord[2] = [$Tempo[1], $Tempo[2]]
+		$aDX = Abs($aPrevCoord[0] - $ToToCoord[0])
+		$aDY = Abs($aPrevCoord[1] - $ToToCoord[1])
+		If ($PrevDX <> $aDX) Or ($PrevDY <> $aDY) Then
+			$PrevDX = $aDX
+			$PrevDY = $aDY
+			_ArrayAdd($goodPath, $item)
+		EndIf
+		$aPrevCoord = $ToToCoord
+	Next
+	For $i = 0 To UBound($goodPath) - 1 Step 1
+		Local $Tempo = StringSplit($item, ",")
+		Local $ToToCoord[2] = [$Tempo[1], $Tempo[2]]
+		GoToCoord($ToToCoord, 0, False)
+	Next
+EndFunc
+
+;-----------------------------------------------
 ; Пытается перейти на коордионаты
 ; Параметры:
 ; $aToCoords - Куда идти - массив из 2 элементов,
@@ -707,6 +786,7 @@ Func GoToCoord($aToCoords, $aCanTeleport = 0, $aCenterMouse = True)
 	Local Const $GoToValues[8] = [1, 0, 10, 20, 21, 22, 12, 2]
 
 	Local $curCoords = GetCurrentPos()
+	If ($curCoords[0] == $aToCoords[0]) And ($curCoords[1] == $aToCoords[1]) Then Return
 	Local $prevCurCoords[2] = [-1, -1]
 	Local $multiplier = 1
 	Local $MaxGotoIter = 2 * (Abs($curCoords[0] - $aToCoords[0]) + Abs($curCoords[1] - $aToCoords[1]))
@@ -748,13 +828,18 @@ Func GoToCoord($aToCoords, $aCanTeleport = 0, $aCenterMouse = True)
 			$curRetryIter = 0
 		EndIf
 
-		$multiplier = 4
-		If Abs($aToCoords[0] - $curCoords[0]) + Abs($aToCoords[1] - $curCoords[1]) < 4 Then $multiplier = Abs($aToCoords[0] - $curCoords[0]) + Abs($aToCoords[1] - $curCoords[1])
+		If (Abs($aToCoords[0] - $curCoords[0]) <> 0) And (Abs($aToCoords[1] - $curCoords[1]) <> 0) Then
+			$multiplier = _Min(Abs($aToCoords[0] - $curCoords[0]), Abs($aToCoords[1] - $curCoords[1]))
+		ElseIf Abs($aToCoords[0] - $curCoords[0]) > 0 Then
+			$multiplier = Abs($aToCoords[0] - $curCoords[0])
+		ElseIf Abs($aToCoords[1] - $curCoords[1]) > 0 Then
+			$multiplier = Abs($aToCoords[1] - $curCoords[1])
+		EndIf
+		if $multiplier > 4 Then $multiplier = 4
 		If $multiplier < 1 Then $multiplier = 1
 
 		$MDx = Sign(Mod($GoToPos + 3, 4)) * (Mod(Int(($GoToPos + 3)/4), 2) * 2 - 1) * ($cMDelta + $cMCorner * Sign(Mod($GoToPos + 1, 2))) * $multiplier
 		$MDy = Sign(Mod($GoToPos + 1, 4)) * (    Int ($GoToPos     /4)     * 2 - 1) * ($cMDelta + $cMCorner * Sign(Mod($GoToPos + 1, 2))) * $multiplier * 0.7
-		ConsoleWrite(StringFormat("%d %d", $MDx, $MDy))
 
 		$multiplier = 1
 		MouseMove($cMCenter[0] + $MDx, $cMCenter[1] + $MDy, 0)
@@ -778,7 +863,7 @@ Func GoToCoord($aToCoords, $aCanTeleport = 0, $aCenterMouse = True)
 			DoTeleport()
 		Else
 			DoMainClick(50)
-			Sleep($multiplier * 100)
+			Sleep($multiplier * 500)
 		EndIf
 
 		$prevCurCoords = $curCoords
