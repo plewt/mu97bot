@@ -8,7 +8,6 @@ Opt("CaretCoordMode", 2)
 #include <Constants.au3>
 #include <SendMessage.au3>
 #include <GDIP.au3>
-#include <A-Star.au3>
 HotKeySet("{ESC}", "Terminate")
 HotKeySet("{TAB}", "DoTest")
 WinActivate('©WakeUp')
@@ -41,51 +40,8 @@ Func DoTest()
 
 ;~   	Local $StartTime = TimerInit()
 	Local $ToCoord[2] = [191, 121]
-;~ 	Local $StartCoord = GetCurrentPos()
-
-;~ 	Local $MyMapArray[256][256]
-;~ 	Local $MyMapFile = FileOpen("C:\\MU\\Data\\World4\\Terrain.att", 4)
-;~ 	Local $CurCharNum = 0
-;~ 	FileRead($MyMapFile, 3)
-;~ 	While 1
-;~ 		Local $CurChar = FileRead($MyMapFile, 1)
-;~ 		If @error = -1 Then ExitLoop
-
-;~ 		Local $CurY = Int($CurCharNum / 256)
-;~ 		Local $CurX = $CurCharNum - $CurY * 256
-;~ 		If Asc($CurChar) > 1 Then
-;~ 			$MyMapArray[$CurY][$CurX] = "x"
-;~ 		Else
-;~ 			$MyMapArray[$CurY][$CurX] = "0"
-;~ 		EndIf
-
-;~ 		$CurCharNum += 1
-;~ 	WEnd
-;~ 	FileClose($MyMapFile)
-
-;~ 	For $i = 0 To 255 Step 1
-;~ 		$MyMapArray[0][$i] = "x"
-;~ 		$MyMapArray[255][$i] = "x"
-;~ 	Next
-;~  	For $i = 0 To 255 Step 1
-;~ 		$MyMapArray[$i][0] = "x"
-;~ 		$MyMapArray[$i][255] = "x"
-;~ 	Next
-
-;~ 	$MyMapArray[$StartCoord[1]][$StartCoord[0]] = "s"
-;~ 	$MyMapArray[$ToCoord[1]][$ToCoord[0]] = "g"
-
-;~ 	_CreateMap($MyMapArray, 256, 256)
-
-;~ 	Dim $path = _FindPath($MyMapArray, $MyMapArray[$StartCoord[1]][$StartCoord[0]], $MyMapArray[$ToCoord[1]][$ToCoord[0]])
-
-;~ 	For $i = 0 To UBound($path) - 1 Step 1
-;~ 		$item = $path[$i]
-;~ 		Local $Tempo = StringSplit($item, ",")
-;~ 		Local $ToToCoord[2] = [$Tempo[1], $Tempo[2]]
-;~ 		GoToCoord($ToToCoord, 0, False)
-;~ 	Next
-	GoToCoord($ToCoord)
+	GoToCoordAStar($ToCoord, "noria")
+;~ 	GoToCoord($ToCoord)
   	Local $TimeTook = TimerDiff($StartTime)
 ;~ 	CenterMouse(0, 0)
 	MsgBox(0, "test", "DONE! Time TOOK : " & String($TimeTook))

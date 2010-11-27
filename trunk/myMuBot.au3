@@ -187,8 +187,7 @@ EndFunc
 Func NeedLoot()
 ;~ 	Local $BenchTimer = TimerInit()
 	Const $LootColors[5] = [$calJewelTextColor, $calBlueTextColor, $calGrayTextColor, $calWhiteTextColor, $calOrangeTextColor]
-;~ 	Const $LootWords[4] = ["Jewel", "Heart", "Feather", "Healing"]
-	Const $LootWords[1] = ["Jewel"]
+	Const $LootWords[4] = ["Jewel", "Heart", "Feather", "Healing"]
 	Const $LootWords1[1] = ["Heart"]
 	Const $LootExcludeWords[2] = ["Chaos", "Soldier"]
 ;~ 	Const $LootWords[4] = ["Jewel", "Heart", "Feather"]
