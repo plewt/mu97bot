@@ -2,6 +2,7 @@ Opt("MouseCoordMode", 2)
 Opt("PixelCoordMode", 2)
 Opt("CaretCoordMode", 2)
 #include "muBotCommon.au3"
+#include "array.au3"
 #include <IE.au3>
 #include <Tesseract.au3>
 #include <ScreenCapture.au3>
@@ -19,8 +20,11 @@ While 1
 WEnd
 
 Func DoTest()
+;~ 	SetResolution(800)
+;~  	ShowToolTip("" & String())
+;~  	ShowToolTip("" & String(GetHealthLevel()))
 ;~ 	Local $coord[2] = [20, 738]
- 	Local $StartTime = TimerInit()
+;~  	Local $StartTime = TimerInit()
 ;~   	Local $coord = GetCurrentPos()
 ;~  	Local $TimeTook = TimerDiff($StartTime)
 ;~ 	ConsoleWrite(@CRLF & "Took : " & String($TimeTook))
@@ -39,12 +43,12 @@ Func DoTest()
 ;~ 	$button1_pos = _TesseractWinFind("©WakeUp", "", "Deafasf", 1, 0, "", 1, 1, $coord[0], $coord[1], 1024 - $coord[0] - 150, 768 - $coord[1] - 15, 0)
 
 ;~   	Local $StartTime = TimerInit()
-	Local $ToCoord[2] = [191, 121]
-	GoToCoordAStar($ToCoord, "noria")
+;~ 	Local $ToCoord[2] = [191, 121]
+;~ 	GoToCoordAStar($ToCoord, "noria")
 ;~ 	GoToCoord($ToCoord)
-  	Local $TimeTook = TimerDiff($StartTime)
+;~   	Local $TimeTook = TimerDiff($StartTime)
 ;~ 	CenterMouse(0, 0)
-	MsgBox(0, "test", "DONE! Time TOOK : " & String($TimeTook))
+;~ 	MsgBox(0, "test", "DONE! Time TOOK : " & String($TimeTook))
 ;~ 	MsgBox(0, "test", "" & GetCursorColor())
 ;~ 	MsgBox(0, "test", "" & GetCursorColor())
 ;~ 	Local $curpp = MouseGetPos()

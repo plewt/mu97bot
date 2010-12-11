@@ -996,8 +996,8 @@ Func CaptureToTIFF($win_title = "", $win_text = "", $ctrl_id = "", $sOutImage = 
 	$hImage3 = _GDIPlus_ImageGrayscale($hImage2)
 
 	If $aWhiteLevel > -1 Then
-		For $aX = $pos[0] To ($pos[2] - $pos[0]) - $right_indent - $left_indent - 1 Step 1
-			For $aY = $pos[1] To ($pos[3] - $pos[1]) - $bottom_indent - $top_indent - 1 Step 1
+		For $aX = $pos[0] To ($pos[2] - $pos[0]) - $right_indent - $left_indent Step 1
+			For $aY = $pos[1] To ($pos[3] - $pos[1]) - $bottom_indent - $top_indent Step 1
 				Local $curPixel = BitXOR(_GDIPlus_BitmapGetPixel($hImage3, $aX, $aY), 0xFF000000)
 				$curPixel = _ColorGetRGB($curPixel)
 				If Not @error Then

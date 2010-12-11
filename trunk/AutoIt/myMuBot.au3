@@ -5,7 +5,7 @@
 #include <GUIConstantsEx.au3>
 #include <StaticConstants.au3>
 #include <WindowsConstants.au3>
-HotKeySet("{ESC}", "Terminate")
+HotKeySet("{F8}", "Terminate")
 HotKeySet("{TAB}", "PauseUnpause")
 HotKeySet("{F5}", "MyGUIHideShow")
 
@@ -39,7 +39,7 @@ Dim $cnMana          ; Пьём ли ману
 Dim $cnSwitchSkill   ; Переключаем ли скилл
 Dim $cnLoot          ; Лутаем
 Dim $cnTurn          ; Поворачиваемся ли
-Dim $cnF10           ; надо ли жать F10 чтобы автоскилл
+Dim $cnAutoSkill     ; надо ли жать F10 чтобы автоскилл
 Dim $cnComeBack      ; возвращаемся ли на свою позицию
 Dim $cnMove          ; нужно ли делать /move
 
@@ -67,17 +67,21 @@ Dim Const $ccLast        = 6 ;
 Dim $HealthLevel    = 100
 Dim $ManaLevel      = 100
 Dim $Iteration      = 0
-Dim $CoordsChecksum = PixelChecksum(15, 740, 89, 755)
+Dim $CoordsChecksumPos[4] = [15, 740, 89, 755]
+Dim $CoordsChecksum = PixelChecksum($CoordsChecksumPos[0], $CoordsChecksumPos[1], $CoordsChecksumPos[2], $CoordsChecksumPos[3])
 Dim $Paused = True
 Dim $GuiShown = False
 Dim $Counters[$ccLast + 1] = [0, 0, 0, 0, 0, 0, 0]
 Dim $LootCoords[2] = [0, 0]
 Dim $SearchRect[4] = [100, 100, 900, 550]
 Dim $LootTry = 0
+Dim $cLootAddCoord = 25
+Dim $cCurResolution = 1024
+Dim $cServerNum = 1
 
 WinActivate($cMuHeader)
-$CoordsBefore = GetCurrentPos()
-Dim $CoordsAfter = $CoordsBefore
+Dim $CoordsBefore[2] = [-1, -1]
+Dim $CoordsAfter[2] = [-1, -1]
 
 ; Переменные GUI
 Dim $CharTypeCombo
@@ -106,6 +110,7 @@ Dim $lbLootDur
 Dim $lbComeBackDur
 Dim $lbPartyCount
 Dim $lbLocation
+Dim $lbServerNum
 
 Dim $inIdleDuration
 Dim $inMainSkillDur
@@ -116,14 +121,39 @@ Dim $inHealthLowLevel
 Dim $inManaLowLevel
 Dim $inPartyCount
 Dim $coLocation
+Dim $coServerNum
 
 MyLoadConfig()
 MyGUICreate()
 ;===============================================================
 ; Действия
 ;===============================================================
+Func DoSetResolution($aWidth = 1024)
+	Local $Multiplier = $aWidth / 1024.0
+
+	$CoordsChecksumPos[0] = Int(15 * $Multiplier)
+	$CoordsChecksumPos[1] = Int(740 * $Multiplier)
+	$CoordsChecksumPos[2] = Int(89 * $Multiplier)
+	$CoordsChecksumPos[3] = Int(755 * $Multiplier)
+
+	$CoordsChecksum = PixelChecksum($CoordsChecksumPos[0], $CoordsChecksumPos[1], $CoordsChecksumPos[2], $CoordsChecksumPos[3])
+
+	$SearchRect[0] = Int(100 * $Multiplier)
+	$SearchRect[1] = Int(100 * $Multiplier)
+	$SearchRect[2] = Int(900 * $Multiplier)
+	$SearchRect[3] = Int(550 * $Multiplier)
+
+	$cLootAddCoord = Int(25 * $Multiplier)
+
+	SetResolution($aWidth)
+EndFunc
+
+Func SwitchAutoSkill()
+	If $cnAutoSkill == 1 Then Send("{" + $cAutoSkillKey + "}")
+EndFunc
+
 Func DoComeBack()
-	If $cnF10 == 1 Then Send("{F10}")
+	SwitchAutoSkill()
 	While GetHealthLevel() < 5
 		Sleep(100)
 	WEnd
@@ -139,7 +169,7 @@ Func DoComeBack()
 		GoToCoord($CoordsBefore)
 	EndIf
 	Sleep(200)
-	If $cnF10 == 1 Then Send("{F10}")
+	SwitchAutoSkill()
 EndFunc
 
 Func DoHeal()
@@ -153,32 +183,26 @@ EndFunc
 ; Лутаем
 Func Loot()
 	$LootTry += 1
-;~ 	Local $CoordsBefore = GetCurrentPos()
-;~ 	Local $xv = 512 / 3500
-;~ 	Local $yv = 300 / 3500
-	Local $xv = 512 / 2000
-	Local $yv = 300 / 2000
+	Local $xv = $cMainWndWidth / 4000
+	Local $yv = $cMainWndHeight / 4000
 
- 	If $cnF10 == 1 Then Send("{F10}")
+	SwitchAutoSkill()
 	Local $WasDead = False
-	While GetHealthLevel() < 5
+	While isDead()
 		$WasDead = True
 		Sleep(100)
 	WEnd
 	If $WasDead Then Sleep(1000)
 	Sleep(200)
 	Send("{ALT down}")
-	MouseMove($LootCoords[0] + 25, $LootCoords[1] + 25, 0)
+	MouseMove($LootCoords[0] + $cLootAddCoord, $LootCoords[1] + $cLootAddCoord, 0)
 	Sleep(100)
-	Local $xPathLen = Abs($cMCenter[0] - $LootCoords[0] - 20)
-	Local $yPathLen = Abs($cMCenter[1] - $LootCoords[1] - 20)
-	Local $PathLen = Sqrt($xPathLen*$xPathLen + $yPathLen*$yPathLen)
+	Local $xPathLen = Abs($cMCenter[0] - $LootCoords[0] - $cLootAddCoord)
+	Local $yPathLen = Abs($cMCenter[1] - $LootCoords[1] - $cLootAddCoord)
+	Local $PathLen = Sqrt($xPathLen * $xPathLen + $yPathLen * $yPathLen)
 	Local $XTime = $PathLen / $xv
 	Local $YTime = 0
 
-;~ 	Local $XTime = Abs($cMCenter[0] - $LootCoords[0] - 20) / $xv; X
-;~ 	Local $YTime = Abs($cMCenter[1] - $LootCoords[1] - 20) / $yv ; Y
-;~ 	ShowToolTip(String($XTime + $YTime))
 	DoMainClick(200)
 	CenterMouse()
 	Sleep($XTime + $YTime)
@@ -187,7 +211,7 @@ Func Loot()
 	Sleep(200)
 	DoKeyPress("ALT")
 	CenterMouse()
-	If $cnF10 == 1 Then Send("{F10}")
+	SwitchAutoSkill()
 EndFunc
 
 ; Крутим мышь по кругу
@@ -203,7 +227,8 @@ EndFunc
 ; Переподключаемся
 Func DoReconnect()
 	TakeSnapshot()
-	Reconnect($cPassword, $cCharNumber)
+	Connect($cPassword, $cCharNumber, $cServerNum)
+	SwitchAutoSkill()
 	CenterMouse()
 EndFunc
 ;===============================================================
@@ -226,31 +251,15 @@ EndFunc
 
 ; Проверяем не надо ли слутить
 Func NeedLoot()
-;~ 	Local $BenchTimer = TimerInit()
 	Const $LootColors[5] = [$calJewelTextColor, $calBlueTextColor, $calGrayTextColor, $calWhiteTextColor, $calOrangeTextColor]
-;~ 	Const $LootWords[4] = ["Jewel", "Heart", "Feather", "Healing"]
 	Const $LootWords[1] = ["Jewel"]
 	Const $LootWords1[1] = ["Heart"]
 	Const $LootExcludeWords[2] = ["Chaos", "Soldier"]
-;~ 	Const $LootWords[4] = ["Jewel", "Heart", "Feather"]
 	If CounterCheck($ccLoot, $cLootIdleDuration, $cnLoot) Then
 		Local $Res = False
 		$Res = FindLootInRect($SearchRect, $calJewelTextSize[0], $calJewelTextSize[1], $calJewelTextColor, $LootCoords, $LootWords, $LootExcludeWords, 5)
-;~ 		If $Res Then Return True
-;~ 		For $i = 1 To 4 Step 1
-;~ 			$Res = FindLootInRect($SearchRect, $calJewelTextSize[0], $calJewelTextSize[1], $LootColors[$i], $LootCoords, $LootWords1, 5)
-;~ 			If $Res Then ExitLoop
-;~ 		Next
-;~ 		ConsoleWrite(@CRLF & "TOOK " & TimerDiff($BenchTimer))
-;~ 		Sleep(5000)
 		Return $Res
-;~ 		Return FindLootInRect($SearchRect, $calJewelTextSize[0], $calJewelTextSize[1], $calJewelTextColor, $LootCoords, "Jewel", 5)
-;~ 		Return FindLootInRect($SearchRect, $calJewelTextSize[0], $calJewelTextSize[1], $calJewelTextColor, $LootCoords, "Mana", 5)
-;~ 		Return FindLootInRect($SearchRect, $calJewelTextSize[0], $calJewelTextSize[1], 0xFFFFFF, $LootCoords, "Love", 4)
-;~ 		Return FindLootInRect($SearchRect, $calJewelTextSize[0], $calJewelTextSize[1], $calJewelTextColor, $LootCoords, "Zen", 4)
 	Else
-;~ 		ShowToolTip(TimerDiff($BenchTimer))
-;~ 		Sleep(5000)
 		Return False
 	EndIf
 EndFunc
@@ -259,12 +268,8 @@ EndFunc
 Func NeedReconnect()
 	Local $myWinHandle = WinGetHandle ($cMuHeader)
 	If @error Then Return True
-	If PixelChecksum(424, 118, 434, 128) = 3937422940 Then
-		MouseMove(509, 179, 0)
-		Sleep(200)
-		MouseDown("left")
-		Sleep(30)
-		MouseUp("left")
+	If IsDisconnectWindowOpen() Then
+		Send("{ENTER}")
 		Sleep(1000)
 	EndIf
 	Local $myWinHandle = WinGetHandle ($cMuHeader)
@@ -281,7 +286,7 @@ EndFunc
 ; Проверяем не поменялись ли координаты
 Func CoordsChanged()
 	If $cnCoordsChanged == 0 Then Return False
-	Local $curChecksum = PixelChecksum(15, 740, 89, 755)
+	Local $curChecksum = PixelChecksum($CoordsChecksumPos[0], $CoordsChecksumPos[1], $CoordsChecksumPos[2], $CoordsChecksumPos[3])
 	If $curChecksum == $CoordsChecksum Then
 		Return False
 	Else
@@ -293,7 +298,8 @@ EndFunc
 ; Проверяем не надо ли отменить запрос на пати
 Func NeedDeclineRequest()
 	If $cnDecline == 0 Then Return False
-	Return (PixelChecksum(407, 131, 616, 146) = 1290891972)
+	; Временно отключено
+	Return False
 EndFunc
 
 ; Проверяем не надо ли нам поменять скилл
@@ -381,11 +387,13 @@ EndFunc
 
 ; Пауза - анпауза
 Func PauseUnpause()
-	$CoordsChecksum = PixelChecksum(15, 740, 89, 755)
+	$cCurResolution = _WinAPI_GetClientWidth(WinGetHandle($cMuHeader))
+	DoSetResolution($cCurResolution)
+	$CoordsChecksum = PixelChecksum($CoordsChecksumPos[0], $CoordsChecksumPos[1], $CoordsChecksumPos[2], $CoordsChecksumPos[3])
 	$CoordsBefore = GetCurrentPos()
 	$Paused = Not $Paused
 	SetRequests($Paused)
-	If $cnF10 == 1 Then DoKeyPress("F10")
+	SwitchAutoSkill()
 EndFunc
 
 ; Выход
@@ -418,10 +426,11 @@ Func MySaveConfig()
 	IniWrite($cConfigFileName, "Main", "nSwitchSkill", String($cnSwitchSkill))
 	IniWrite($cConfigFileName, "Main", "nLoot", String($cnLoot))
 	IniWrite($cConfigFileName, "Main", "nTurn", String($cnTurn))
-	IniWrite($cConfigFileName, "Main", "nAutoSkill", String($cnF10))
+	IniWrite($cConfigFileName, "Main", "nAutoSkill", String($cnAutoSkill))
 	IniWrite($cConfigFileName, "Main", "nComeBack", String($cnComeBack))
 	IniWrite($cConfigFileName, "Main", "nMove", String($cnMove))
 	IniWrite($cConfigFileName, "Main", "Location", String($cLocation))
+	IniWrite($cConfigFileName, "Main", "ServerNum", String($cServerNum))
 	IniWrite($cConfigFileName, "DW", "nManashield", String($cnManashield))
 	IniWrite($cConfigFileName, "Elf", "nRebuff", String($cnRebuff))
 	IniWrite($cConfigFileName, "Elf", "PartyCount", String($crCount))
@@ -449,13 +458,14 @@ Func MyLoadConfig()
 	$cnSwitchSkill = Int(IniRead($cConfigFileName, "Main", "nSwitchSkill", "0"))
 	$cnLoot = Int(IniRead($cConfigFileName, "Main", "nLoot", "0"))
 	$cnTurn = Int(IniRead($cConfigFileName, "Main", "nTurn", "0"))
-	$cnF10 = Int(IniRead($cConfigFileName, "Main", "nAutoSkill", "0"))
+	$cnAutoSkill = Int(IniRead($cConfigFileName, "Main", "nAutoSkill", "0"))
 	$cnComeBack = Int(IniRead($cConfigFileName, "Main", "nComeBack", "0"))
 	$cnMove = Int(IniRead($cConfigFileName, "Main", "nMove", "0"))
 	$cLocation = IniRead($cConfigFileName, "Main", "Location", "")
 	$cnManashield = Int(IniRead($cConfigFileName, "DW", "nManashield", "0"))
 	$cnRebuff = Int(IniRead($cConfigFileName, "Elf", "nRebuff", "0"))
 	$crCount = Int(IniRead($cConfigFileName, "Elf", "PartyCount", "0"))
+	$cServerNum = Int(IniRead($cConfigFileName, "Main", "ServerNum", "1"))
 EndFunc
 
 ; GUI
@@ -588,8 +598,8 @@ Func MyProcessGUI()
 
 			Case $cbAutoSkill
 				Local $acbAutoSkill = GUICtrlRead($cbAutoSkill)
-				If $acbAutoSkill == $GUI_CHECKED Then $cnF10 = 1
-				If $acbAutoSkill == $GUI_UNCHECKED Then $cnF10 = 0
+				If $acbAutoSkill == $GUI_CHECKED Then $cnAutoSkill = 1
+				If $acbAutoSkill == $GUI_UNCHECKED Then $cnAutoSkill = 0
 
 			Case $cbComeBack
 				Local $acbComeBack = GUICtrlRead($cbComeBack)
@@ -661,6 +671,11 @@ Func MyProcessGUI()
 
 			Case $coLocation
 				$cLocation = GUICtrlRead($coLocation)
+
+			Case $coServerNum
+				Local $ainServerNum = GUICtrlRead($coServerNum)
+				$cServerNum = Int($ainServerNum)
+
 		EndSwitch
 		Sleep(1)
 	Next
@@ -744,12 +759,12 @@ Func MyGUICreate()
 	If $cnLoot Then GUICtrlSetState(-1, $GUI_CHECKED)
 	GUICtrlSetTip(-1, "Если включено, то бот лутает шмот")
 
-	$cbTurn = GUICtrlCreateCheckbox("Поворачиваться", 25, 287, 97, 17)
+	$cbTurn = GUICtrlCreateCheckbox("Поворачиваться", 25, 287, 113, 17)
 	If $cnTurn Then GUICtrlSetState(-1, $GUI_CHECKED)
 	GUICtrlSetTip(-1, "Если отмечено, то будет двигать мышь по кругу")
 
 	$cbAutoSkill = GUICtrlCreateCheckbox("Включать кликер", 25, 306, 113, 17)
-	If $cnF10 Then GUICtrlSetState(-1, $GUI_CHECKED)
+	If $cnAutoSkill Then GUICtrlSetState(-1, $GUI_CHECKED)
 	GUICtrlSetTip(-1, "Если отмечено - включает кликкер скила")
 
 	$cbComeBack = GUICtrlCreateCheckbox("Возвращаться", 25, 325, 97, 17)
@@ -824,6 +839,11 @@ Func MyGUICreate()
 	GUICtrlSetTip(-1, "Для умной хотьбы и телепортации")
 	$coLocation = GUICtrlCreateCombo("", 408, 348, 121, 25, BitOR($CBS_DROPDOWN,$CBS_AUTOHSCROLL))
 	GUICtrlSetData(-1, "Lorencia|Dungeon|Davias|Noria|Lost Tower|Arena|Atlans|Tarkan|Davil Square|Icarus|Blood Castle|Chaos Castle|Kalima|CryWolf|Aida|Kantru|Kantru 1|Kantru Event|Illusion Tample|Elbeland|Raclion|Raclion Event|Vulcano|Duel Arena", "")
+
+    $lbServerNum = GUICtrlCreateLabel("Номер сервера", 255, 378, 83, 17)
+	GUICtrlSetTip(-1, "Для реконнекта")
+	$coServerNum = GUICtrlCreateCombo("", 408, 373, 121, 25, BitOR($CBS_DROPDOWN,$CBS_AUTOHSCROLL))
+	GUICtrlSetData(-1, "1|2|3|4|5|6|7|8|9|10", String($cServerNum))
 #EndRegion ### END Koda GUI section ###
 ;~ Dim Const $crCount       = 2 ; Сколько человек в пати ребафаем, если 0 - то ребафаем себя
 EndFunc
