@@ -15,66 +15,21 @@ Opt("PixelCoordMode", 2)
 ;
 
 ; Размеры координат
-Dim Const $cXCoordRect[4] = [22, 742, 47, 753] ; прямоугольник, объемлющий X координату
-Dim Const $cYCoordRect[4] = [61, 742, 86, 753] ; прямоугольник, объемлющий Y координату
+Dim $cCoordPos[2]  = [20, 738]
+Dim $cCoordSize[2] = [75, 18]
+Dim $cMaxScale = 6
 Dim Const $cCoordDeltaDig = 2                  ; ширина между знаками в координатах
 Dim Const $cCoordWhiteLevel = 90               ; значение более которого - цвет шрифта
 Dim Const $cDeltaLevel = 5
-; Шаблоны распознования для цифр
-Dim Const $cDigitCount = 11
-Dim Const $cCoordDigitsXHisto[$cDigitCount][12]  = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
-													[5, 3, 4, 4, 4, 4, 4, 3, 4, 3, 5, 4], _
-													[2, 3, 4, 3, 2, 2, 2, 2, 2, 2, 2, 2], _
-													[5, 4, 3, 2, 1, 2, 2, 3, 2, 2, 7, 7], _
-													[5, 3, 4, 2, 3, 3, 2, 3, 4, 4, 5, 4], _
-													[2, 3, 3, 4, 4, 3, 4, 8, 7, 2, 2, 2], _
-													[6, 2, 1, 1, 7, 3, 3, 3, 3, 4, 5, 4], _
-													[5, 3, 4, 1, 7, 4, 4, 4, 4, 4, 5, 5], _
-													[8, 2, 1, 2, 2, 2, 3, 2, 2, 3, 3, 3], _
-													[5, 3, 4, 3, 4, 4, 4, 3, 3, 4, 5, 4], _
-													[5, 4, 4, 3, 5, 6, 7, 2, 2, 4, 4, 4]]
-Dim Const $cCoordDigitsYHisto[$cDigitCount][8] =   [[0, 0,  0, 0, 0,  0,  0,  0], _
-													[7, 8,  3, 2,  3,  11, 10, 3], _
-													[0, 2,  2, 12, 12, 0,  0,  0], _
-													[5, 7,  5, 5,  5,  8,  5,  0], _
-													[3, 6,  4, 3,  5,  10, 9,  2], _
-													[3, 5,  4, 5,  12, 12, 2,  1], _
-													[3, 9,  5, 3,  4,  8,  8,  2], _
-													[8, 8,  4, 3,  4,  11, 9,  3], _
-													[1, 4,  7, 9,  5,  4,  2,  1], _
-													[5, 10, 5, 3,  5,  10, 8,  0], _
-													[5, 9,  5, 3,  5,  11, 9,  3]]
-
-; Окружающие разряды координат прямоугольники (только 8x12)
-Dim Const $cCoordXD1[4] = [22, 742, 29, 753]
-Dim Const $cCoordXD2[4] = [31, 742, 38, 753]
-Dim Const $cCoordXD3[4] = [40, 742, 47, 753]
-
-Dim Const $cCoordXD22[4] = [28, 742, 35, 753]
-Dim Const $cCoordXD32[4] = [38, 742, 45, 753]
-
-Dim Const $cCoordXD33[4] = [36, 742, 43, 753]
-
-Dim Const $cCoordYD1[4] = [61, 742, 68, 753]
-Dim Const $cCoordYD2[4] = [70, 742, 77, 753]
-Dim Const $cCoordYD3[4] = [79, 742, 86, 753]
-
-Dim Const $cCoordYD22[4] = [67, 742, 74, 753]
-Dim Const $cCoordYD32[4] = [76, 742, 83, 753]
-
-Dim Const $cCoordYD33[4] = [74, 742, 81, 753]
 
 ; Положения указателя мыши
-Dim Const $cMCenter[2]  = [512, 335]
-Dim Const $cMDelta 		= 80
-Dim Const $cMCorner     = -23
-Dim Const $cMDRight[2]  = [ $cMDelta, -$cMDelta]
-Dim Const $cMDLeft[2]   = [-$cMDelta,  $cMDelta]
-Dim Const $cMDTop[2]    = [-$cMDelta, -$cMDelta]
-Dim Const $cMDBottom[2] = [ $cMDelta,  $cMDelta]
+Dim $cMCenter[2]  = [512, 335]
+Dim $cMDelta 		= 80
+Dim $cMCorner     = Int(0.29 * $cMDelta)
 
 ; Для хождения
 Dim Const $cgtDefaultCurColor   = 0x00FFFFFF ; Цвет дефолтового курсора
+Dim $cCursorColorPos[2] = [21, 17]
 
 ; Для автолута
 Dim Const $calShade             = 5 ; shade-variation для поиска первой точки нужного цвета
@@ -105,30 +60,18 @@ Dim Const $cSummonBuffKey     = "5"
 Dim Const $cHealthBottleKey   = "Q"
 Dim Const $cManaBottleKey     = "W"
 Dim Const $cAlcoBottleKey     = "E"
+Dim Const $cAutoSkillKey      = "F10"
+Dim Const $cLauncherPlay      = "!p"
+Dim Const $cLauncherToWindow  = "F12"
 
-; Константы для орбов хп и маны
-Dim Const $cbDeltaColor          = 5 ; отклонение цвета на это значение не считаем отклонением
 ; хп
-Dim Const $chbRect[2][2]         = [[198, 694], [198, 768]]
-Dim Const $chbColors[$chbRect[1][1] - $chbRect[0][1] + 1] = [6946816, 6946816, 8060928, _
-			8060928, 6946816, 8585216, 8585216, 10747904, 9109504, 9109504, 9699328, 9699328, _
-			10223616, 10747904, 10747904, 10747904, 11272192, 11272192, 11796480, 11796480, _
-			10747904, 10223616, 10223616, 10223616, 9109504, 9109504, 9109504, 9109504, 9699328, _
-			10223616, 10223616, 10223616, 10223616, 10223616, 10747904, 10747904, 10747904, 11796480, _
-			11796480, 12386304, 12910592, 12910592, 12910592, 12910592, 13959168, 13959168, 13959168, _
-			12386304, 12910592, 12910592, 12910592, 12910592, 13434880, 15073280, 15073280, 15597568, _
-			15597568, 15597568, 15597568, 15597568, 16121856, 15597568, 15597568, 16121856, 13959168, _
-			13959168, 11272192, 11272192, 12910592, 12386304, 12386304, 11796480, 9110528, 9110528, _
-			12177898]
+Dim $chbRect[2][2] = [[195, 694], [195, 766]]
+Dim Const $chbColors[3]  = [90, 255, 10]
 ; мана
-Dim Const $cmbRect[2][2]         = [[830, 694], [830, 768]]
-Dim Const $cmbColors[$chbRect[1][1] - $chbRect[0][1] + 1] = [90, 90, 106, 106, 90, 106, 106, 123, 98, _
-			98, 123, 123, 139, 139, 139, 139, 139, 139, 123, 123, 106, 98, 98, 98, 106, 106, 115, 115, _
-			115, 123, 123, 123, 131, 131, 131, 131, 131, 139, 139, 139, 139, 139, 131, 131, 156, 172, _
-			172, 148, 139, 139, 148, 148, 164, 197, 197, 197, 189, 189, 197, 197, 205, 197, 197, 197, _
-			180, 180, 131, 131, 148, 148, 148, 139, 526426, 526426, 12177898]
+Dim $cmbRect[2][2] = [[825, 694], [825, 766]]
+Dim Const $cmbColors[3]  = [70, 255, 10]
 ; пати
-Dim Const $crPartyStart[2] = [1000, 20]
+Dim $crPartyStart[2] = [1000, 20]
 Dim Const $crPartyDeltaY   = 50
 
 ; Типы персонажей
@@ -140,6 +83,17 @@ Dim Const $cctDK  = 20
 Dim Const $cctBK  = 21
 Dim Const $cctMG  = 30
 
+; Для реконнекта
+Dim $cDisconnectWindowRect[4] = [397, 119, 621, 134]
+Dim $cServerSelectPos[2] = [506, 364]
+Dim $cSubserverSelectPos[2] = [620, 342]
+Dim $cSubServerHeight = 30
+Dim $cCharSelectPos[2] = [250, 500]
+Dim $cCharSelectWidth = 120
+
+; Для отказа от реквеста
+Dim $cRequestCancel[2] = [580, 175]
+
 ; Общие
 Dim Const $cMuHeader               = '©WakeUp' ; Заголовок окна му
 Dim Const $cMuClass                = 'MU' ; Класс окна му
@@ -147,8 +101,8 @@ Dim Const $cMuPath                 = "C:\\MU"
 Dim Const $cMuLauncherHeader       = 'Losena MuOnline Launcher v0.1.0.6' ; Заголовок окна лончера
 Dim Const $cMuLauncherPath         = '' ; Путь к лончеру
 Dim Const $cReconnectTryes         = 600 ; Сколько секунд ждём запуска mu
-Dim Const $cMainWndWidth           = 1024
-Dim Const $cMainWndHeight          = 768
+Dim $cMainWndWidth           = 1024
+Dim $cMainWndHeight          = 768
 
 Dim Const $cgtWorldsLocs[24][2]  = [["World1", "Lorencia"], ["World2", "Dungeon"], ["World3", "Davias"], ["World4", "Noria"], _
  							 ["World5", "Lost Tower"], ["World7", "Arena"], ["World8", "Atlans"], ["World9", "Tarkan"], _
@@ -157,11 +111,74 @@ Dim Const $cgtWorldsLocs[24][2]  = [["World1", "Lorencia"], ["World2", "Dungeon"
 							 ["World35", "Aida"], ["World38", "Kantru"], ["World39", "Kantru 1"], ["World40", "Kantru Event"], _
 							 ["World47", "Illusion Tample"], ["World52", "Elbeland"], ["World58", "Raclion"], _
 							 ["World59", "Raclion Event"], ["World64", "Vulcano"], ["World65", "Duel Arena"]]
-
 ;
 ; Функции
 ;
 Dim $ActiveSkill = $cMainSkillKey
+
+;-----------------------------------------------
+; Устанавливаем разрешение
+; Параметры:
+;		$aWidth - ширина прямоугольника надписи
+;		$aHeight - высота прямоугольника надписи
+Func SetResolution($aWidth = 1024)
+	Local $Multiplier = $aWidth / 1024.0
+
+	$cMainWndWidth = $aWidth
+
+	$cMaxScale = Int(5 / $Multiplier)
+
+	$cMainWndHeight = Int(768 * $Multiplier)
+
+	$cCursorColorPos[0] = Int(21 * $Multiplier)
+	$cCursorColorPos[1] = Int(17 * $Multiplier)
+
+	$cCoordPos[0] = Int(20 * $Multiplier)
+	$cCoordPos[1] = Int(738 * $Multiplier)
+
+	$cCoordSize[0] = Int(74 * $Multiplier)
+	$cCoordSize[1] = Int(17 * $Multiplier)
+
+	$cMCenter[0] = Int(512 * $Multiplier)
+	$cMCenter[1] = Int(335 * $Multiplier)
+
+	$chbRect[0][0] = Int(195 * $Multiplier)
+	$chbRect[0][1] = Int(694.0 * $Multiplier)
+	$chbRect[1][0] = Int(195 * $Multiplier)
+	$chbRect[1][1] = Int(766 * $Multiplier)
+
+	$cmbRect[0][0] = Int(825 * $Multiplier)
+	$cmbRect[0][1] = Int(694.0 * $Multiplier)
+	$cmbRect[1][0] = Int(825 * $Multiplier)
+	$cmbRect[1][1] = Int(766 * $Multiplier)
+
+	$crPartyStart[0] = Int(1000 * $Multiplier)
+	$crPartyStart[1] = Int(20 * $Multiplier)
+
+	$cMDelta  = Int(80 * $Multiplier)
+	$cMCorner = Int(0.29 * $cMDelta)
+
+	$cServerSelectPos[0] = Int(506 * $Multiplier)
+	$cServerSelectPos[1] = Int(364 * $Multiplier)
+
+	$cSubserverSelectPos[0] = Int(620 * $Multiplier)
+	$cSubserverSelectPos[1] = Int(342 * $Multiplier)
+
+	$cSubServerHeight = Int(30 * $Multiplier)
+
+	$cCharSelectPos[0] = Int(250 * $Multiplier)
+	$cCharSelectPos[1] = Int(500 * $Multiplier)
+
+	$cCharSelectWidth = Int(120 * $Multiplier)
+
+	$cRequestCancel[0] = Int(580 * $Multiplier)
+	$cRequestCancel[1] = Int(175 * $Multiplier)
+
+	$cDisconnectWindowRect[0] = Int(397 * $Multiplier)
+	$cDisconnectWindowRect[1] = Int(119 * $Multiplier)
+	$cDisconnectWindowRect[2] = Int(621 * $Multiplier)
+	$cDisconnectWindowRect[3] = Int(134 * $Multiplier)
+EndFunc
 
 ;-----------------------------------------------
 ; Ищем джувелы в заданном прямоугольнике
@@ -220,26 +237,22 @@ Func FindLootInRect(ByRef $aSearchRect, $aWhatWidth, $aWhatHeight, $aFirstPixelC
 			$aRetCoord = $coord
 			Return True
 		Else
-
 			If (($coord[0] - 1) >= $aSearchRect[0]) And ($coord[1] <= $aSearchRect[3]) Then
 				Dim $LeftTopSearchRect[4] = [$aSearchRect[0], $aSearchRect[1], $coord[0] - 1, $coord[1]]
 				If FindLootInRect($LeftTopSearchRect, $aWhatWidth, $aWhatHeight, $aFirstPixelColor, $aRetCoord, $aLootText, $aScale) Then Return True
 			EndIf
 
 			If ($coord[0] <= $aSearchRect[2]) And (($coord[1] + 1) <= $aSearchRect[3]) Then
-;~ 				Dim $LeftBottomSearchRect[4] = [$aSearchRect[0], $coord[1] + 1, $coord[0], $aSearchRect[3]]
 				Dim $LeftBottomSearchRect[4] = [$aSearchRect[0], $coord[1] + $aWhatHeight + 1, $coord[0], $aSearchRect[3]]
 				If FindLootInRect($LeftBottomSearchRect, $aWhatWidth, $aWhatHeight, $aFirstPixelColor, $aRetCoord, $aLootText, $aScale) Then Return True
 			EndIf
 
 			If ($coord[0] <= $aSearchRect[2]) And (($coord[1] - 1) >= $aSearchRect[1])Then
-;~ 				Dim $RightTopSearchRect[4] = [$coord[0], $aSearchRect[1], $aSearchRect[2], $coord[1] - 1]
 				Dim $RightTopSearchRect[4] = [$coord[0] + $aWhatWidth, $aSearchRect[1], $aSearchRect[2], $coord[1] - 1]
 				If FindLootInRect($RightTopSearchRect, $aWhatWidth, $aWhatHeight, $aFirstPixelColor, $aRetCoord, $aLootText, $aScale) Then Return True
 			EndIf
 
 			If (($coord[0] + 1) <= $aSearchRect[2]) And (($coord[1] - 1) <= $aSearchRect[3]) Then
-;~ 				Dim $RightBottomSearchRect[4] = [$coord[0] + 1, $coord[1], $aSearchRect[2], $aSearchRect[3]]
 				Dim $RightBottomSearchRect[4] = [$coord[0] + $aWhatWidth + 1, $coord[1] + $aWhatHeight, $aSearchRect[2], $aSearchRect[3]]
 				If FindLootInRect($RightBottomSearchRect,$aWhatWidth, $aWhatHeight, $aFirstPixelColor, $aRetCoord, $aLootText, $aScale) Then Return True
 			EndIf
@@ -247,64 +260,6 @@ Func FindLootInRect(ByRef $aSearchRect, $aWhatWidth, $aWhatHeight, $aFirstPixelC
 	EndIf
 	Return False
 EndFunc
-
-;-----------------------------------------------
-; Получение текстового значения координатного разряда
-; Параметры:
-;		$aRect - в каком прямоугольнике ищем
-; Возвращаемое значение - текстовое значение
-;   либо " ", либо цифра (0 - 9)
-;-----------------------------------------------
-Func GetDigitValue($aRect, $aCompareType = 2)
-	If ($aRect[2] - $aRect[0]) <> 7  Then Return ""
-	If ($aRect[3] - $aRect[1]) <> 11 Then Return ""
-
-	Local $MyDigitsRating[$cDigitCount] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-	Local $MyXHistoGramm[12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-	Local $MyYHistoGramm[8]  = [0, 0, 0, 0, 0, 0, 0, 0]
-	For $aY = $aRect[1] To $aRect[3] Step 1
-		For $aX = $aRect[0] To $aRect[2] Step 1
-			Local $pixColor = _ColorGetRGB(PixelGetColor($aX, $aY))
-			If _Min(_Min($pixColor[0], $pixColor[1]), $pixColor[2]) > $cCoordWhiteLevel Then
-				If ($aCompareType == 0) Or ($aCompareType == 2) Then
-					$MyXHistoGramm[$aY - $aRect[1]] += 1
-				EndIf
-				If ($aCompareType == 1) Or ($aCompareType == 2) Then
-					$MyYHistoGramm[$aX - $aRect[0]] += 1
-				EndIf
-			EndIf
-		Next
-	Next
-	For $digit = 0 To $cDigitCount - 1 Step 1
-		If ($aCompareType == 0) Or ($aCompareType == 2) Then
-			For $aY = 0 To 11 Step 2
-				$MyDigitsRating[$digit] += Abs($MyXHistoGramm[$aY] - $cCoordDigitsXHisto[$digit][$aY])
-			Next
-		EndIf
-		If ($aCompareType == 1) Or ($aCompareType == 2) Then
-			For $aX = 0 To 7 Step 1
-				$MyDigitsRating[$digit] += Abs($MyYHistoGramm[$aX] - $cCoordDigitsYHisto[$digit][$aX])
-			Next
-		EndIf
-	Next
-
-	Local $MinDifference = $MyDigitsRating[0]
-	Local $MinDifferenceNum = 0
-	For $digit = 0 To $cDigitCount - 1 Step 1
-		If $MinDifference > $MyDigitsRating[$digit] Then
-			$MinDifference = $MyDigitsRating[$digit]
-			$MinDifferenceNum = $digit
-		EndIf
-	Next
-
-	If $MinDifferenceNum == 0 Then
-		Return ""
-	Else
-		Return String($MinDifferenceNum - 1)
-	EndIf
-EndFunc
-
-
 
 ;-----------------------------------------------
 ; Получение текущих координат персонажа
@@ -315,81 +270,62 @@ EndFunc
 Func GetCurrentPos()
 ;~ 	Более аккуратный метод, но в тоже время более медленный - так как использует tesseract
  	Local $CurPos[2] = [-1, -1]
-	Local $coord[2] = [20, 738]
-	Local $TempCoords = _TesseractWinCapture($cMuHeader, "", 0, "", 1, 1, $coord[0], $coord[1], 1024 - $coord[0] - 75, 768 - $coord[1] - 18, 0, $cCoordWhiteLevel)
-	$TempCoords = StringReplace($TempCoords, "|", "1")
-	$TempCoords = StringReplace($TempCoords, "?", "7")
-	Local $TempCurPos = StringSplit($TempCoords, " ")
- 	If Int($TempCurPos[0]) = 2 Then
-		$CurPos[0] = $TempCurPos[1]
-		$CurPos[1] = $TempCurPos[2]
- 	EndIf
+	Local $TempCoords = ""
+	For $CurScale = $cMaxScale To 1 Step -1
+		$TempCoords = _TesseractWinCapture($cMuHeader, "", 0, "", 1, $CurScale, $cCoordPos[0], $cCoordPos[1], $cMainWndWidth - $cCoordPos[0] - $cCoordSize[0], $cMainWndHeight - $cCoordPos[1] - $cCoordSize[1], 0, $cCoordWhiteLevel)
+		$TempCoords = StringReplace($TempCoords, "|", "1")
+		$TempCoords = StringReplace($TempCoords, "?", "7")
+		$TempCoords = StringReplace($TempCoords, @CRLF, "")
+;~ 		ConsoleWrite(@CRLF & "Coords RAW : " & $TempCoords & " @Scale " & $CurScale)
+		If StringRegExp($TempCoords, "[^0-9 ]", 0) == 0 Then
+			Local $TempCurPos = StringSplit($TempCoords, " ")
+			If Int($TempCurPos[0]) = 2 Then
+				$CurPos[0] = $TempCurPos[1]
+				$CurPos[1] = $TempCurPos[2]
+				ExitLoop
+			EndIf
+		EndIf
+	Next
 	Return $CurPos
-
-;~  Быстрый, но часто ошибающийся метод
-;~ 	Local $CurPos[2] = [-1, -1]
-;~ 	Local $FirstXC = GetDigitValue($cCoordXD1)
-;~ 	Local $FirstYC = GetDigitValue($cCoordXD1)
-
-;~ 	Local $SecondXC = ""
-;~ 	Local $SecondYC = ""
-
-;~ 	If $FirstXC == "" Then
-;~ 		$SecondXC = GetDigitValue($cCoordXD22)
-;~ 		If $SecondXC == "" Then
-;~ 			$CurPos[0] = Int($FirstXC & $SecondXC & GetDigitValue($cCoordXD33))
-;~ 		Else
-;~ 			$CurPos[0] = Int($FirstXC & $SecondXC & GetDigitValue($cCoordXD32))
-;~ 		EndIf
-;~ 	Else
-;~ 		$CurPos[0] = Int($FirstXC & GetDigitValue($cCoordXD2) & GetDigitValue($cCoordXD3))
-;~ 	EndIf
-
-;~ 	If $FirstYC == "" Then
-;~ 		$SecondYC = GetDigitValue($cCoordYD22)
-;~ 		If $SecondYC == "" Then
-;~ 			$CurPos[1] = Int($FirstYC & $SecondYC & GetDigitValue($cCoordYD33))
-;~ 		Else
-;~ 			$CurPos[1] = Int($FirstYC & $SecondYC & GetDigitValue($cCoordYD32))
-;~ 		EndIf
-;~ 	Else
-;~ 		$CurPos[1] = Int($FirstXC & GetDigitValue($cCoordYD2) & GetDigitValue($cCoordYD3))
-;~ 	EndIf
-;~ 	Return $CurPos
 EndFunc
 
 ;-----------------------------------------------
 ; Получение текущего уровня по столбику (орбу)
 ; Параметры:
-;		$aOrbColors - цвета полного орба
+;		$aOrbColor - набор ограничителей цветов
 ;		$aOrbRect - область орба
 ;		$aChannel - какой канал сравниваем
 ; Возвращаемое значение - уровень в %
 ;-----------------------------------------------
-Func GetOrbLevel($aOrbColors, $aOrbRect, $aChannel = 0)
+Func GetOrbLevel($aOrbColor, $aOrbRect, $aChannel = 0)
 	Local $OrbHeigth = $aOrbRect[1][1] - $aOrbRect[0][1] + 1
 	Local $Colors[$OrbHeigth]
 	Local $BadColors = 0
 	Local $DeltaColor = 0
+	Local $DeltaOtherColor = 0
 	For $aY = $aOrbRect[0][1] To $aOrbRect[1][1] Step 1
 		$Colors[$aY - $aOrbRect[0][1]] = PixelGetColor($aOrbRect[0][0], $aY)
 	Next
 	For $aY = 0 To $OrbHeigth - 1 Step 1
-		If $Colors[$aY] <> $aOrbColors[$aY] Then
-			; сравниваем только красный канал
-			Switch $aChannel
-				Case -1
-					$DeltaColor = Abs($Colors[$aY] - $aOrbColors[$aY])
-					$DeltaColor = _ColorGetRed($DeltaColor) + _ColorGetGreen($DeltaColor) + _ColorGetBlue($DeltaColor)
-				Case 0
-					$DeltaColor = _ColorGetRed(Abs($Colors[$aY] - $aOrbColors[$aY]))
-				Case 1
-					$DeltaColor = _ColorGetGreen(Abs($Colors[$aY] - $aOrbColors[$aY]))
-				Case 2
-					$DeltaColor = _ColorGetBlue(Abs($Colors[$aY] - $aOrbColors[$aY]))
-			EndSwitch
-			If $DeltaColor > $cbDeltaColor Then $BadColors += 1
-		EndIf
+		Switch $aChannel
+			Case -1
+				$DeltaColor = _Max(_Max(_ColorGetRed($Colors[$aY]), _ColorGetGreen($Colors[$aY])) , _ColorGetBlue($Colors[$aY]))
+				$DeltaOtherColor = $aOrbColor[2]
+			Case 1
+				$DeltaColor = _ColorGetRed($Colors[$aY])
+				$DeltaOtherColor = _Max(_ColorGetBlue($Colors[$aY]), _ColorGetGreen($Colors[$aY]))
+			Case 2
+				$DeltaColor = _ColorGetGreen($Colors[$aY])
+				$DeltaOtherColor = _Max(_ColorGetRed($Colors[$aY]), _ColorGetBlue($Colors[$aY]))
+			Case 4
+				$DeltaColor = _ColorGetBlue($Colors[$aY])
+				$DeltaOtherColor = _Max(_ColorGetRed($Colors[$aY]), _ColorGetGreen($Colors[$aY]))
+			Case 3
+				$DeltaColor = _Max(_ColorGetRed($Colors[$aY]), _ColorGetGreen($Colors[$aY]))
+				$DeltaOtherColor = _ColorGetBlue($Colors[$aY])
+
+		EndSwitch
+		If (($DeltaColor < $aOrbColor[0]) or ($DeltaColor > $aOrbColor[1])) or ($DeltaOtherColor > $aOrbColor[2]) Then $BadColors += 1
 	Next
 	Return ((1 - ($BadColors / $OrbHeigth)) * 100)
 EndFunc
@@ -399,7 +335,7 @@ EndFunc
 ; Возвращаемое значение - % хп
 ;-----------------------------------------------
 Func GetHealthLevel()
-	Return GetOrbLevel($chbColors, $chbRect, 1)
+	Return GetOrbLevel($chbColors, $chbRect, 3)
 EndFunc
 
 Func isDead()
@@ -410,7 +346,7 @@ EndFunc
 ; Возвращаемое значение - % маны
 ;-----------------------------------------------
 Func GetManaLevel()
-	Return GetOrbLevel($cmbColors, $cmbRect, 2)
+	Return GetOrbLevel($cmbColors, $cmbRect, 4)
 EndFunc
 
 ;-----------------------------------------------
@@ -488,7 +424,6 @@ Func DoTeleport()
 	DoSkill($cTeleportKey)
 EndFunc
 
-
 ;-----------------------------------------------
 ; Выпить хп
 ;-----------------------------------------------
@@ -527,7 +462,6 @@ EndFunc
 Func DrinkAlcohol()
 	DoKeyPress($cAlcoBottleKey)
 EndFunc
-
 
 Func DoBuff($aKey, $aSelf)
 	Local $OldMousePos
@@ -598,12 +532,11 @@ EndFunc
 ;		$aPassword - пароль к акку
 ;		$aCharNumber - номер персонажа
 ;-----------------------------------------------
-Func Reconnect($aPassword, $aCharNumber)
-	Sleep(4000)
-	WinActivate($cMuLauncherHeader)
-	Sleep(1000)
-	Send("!p")
-	Sleep(100)
+Func Connect($aPassword, $aCharNumber, $aServerNumber = 1)
+	Local $LauncherHandle = WinGetHandle($cMuLauncherHeader)
+	_WinAPI_SwitchToThisWindow($LauncherHandle, True)
+	Sleep(200)
+	Send($cLauncherPlay)
 	Local $myWinHandle = WinGetHandle($cMuHeader)
 	Local $runTry = 1
 	While @error And ($runTry < $cReconnectTryes)
@@ -611,40 +544,30 @@ Func Reconnect($aPassword, $aCharNumber)
 		$runTry += 1
 		Sleep(1000)
 	WEnd
-	Sleep(120000)
-	Send("{F12}")
+	Sleep(120000) ; Ждём пока запустится игра
+	Send("{" & $cLauncherToWindow & "}")
 	Sleep(10000)
-	WinActivate($cMuHeader)
-	MouseMove(506, 364, 0)
+	_WinAPI_SwitchToThisWindow($cMuHeader, True)
+	MouseMove($cServerSelectPos[0], $cServerSelectPos[1], 0)
 	Sleep(200)
-	MouseDown("left")
-	Sleep(300)
-	MouseUp("left")
+	DoMainClick()
 	Sleep(1000)
-	MouseMove(620, 342, 0)
-	Sleep(200)
-	MouseDown("left")
-	Sleep(300)
-	MouseUp("left")
+	MouseMove($cSubserverSelectPos[0], $cSubserverSelectPos[1] + ($aServerNumber - 1) * $cSubServerHeight, 0)
+	DoMainClick()
 	Sleep(5000)
 	Send($aPassword)
-	Sleep(200)
+	Sleep(100)
 	Send("{ENTER}")
 	Sleep(5000)
-	MouseMove(250 + ($aCharNumber - 1) * 120, 500, 0) ;
+	MouseMove($cCharSelectPos[0] + ($aCharNumber - 1) * $cCharSelectWidth, $cCharSelectPos[1], 0)
 	Sleep(200)
-	MouseDown("left")
-	Sleep(300)
-	MouseUp("left")
+	DoMainClick(300)
 	Sleep(500)
 	Send("{ENTER}")
 	Sleep(5000)
-	Send("{1 down}")
-	Sleep(200)
-	Send("{1 up}")
-	sleep(100)
-	Send("{F10}")
-	Sleep(1000)
+	DoKeyPress($ActiveSkill)
+	Sleep(100)
+	CenterMouse()
 EndFunc
 
 ;-----------------------------------------------
@@ -657,17 +580,15 @@ EndFunc
 ;-----------------------------------------------
 ; Цвет курсора в точке
 ;-----------------------------------------------
-Func GetCursorColor($aX = 21, $aY = 17)
+Func GetCursorColor($aX = 0, $aY = 0)
+	If ($aX == 0) Then $aX = $cCursorColorPos[0]
+	If ($aY == 0) Then $aY = $cCursorColorPos[1]
 	Local $CaptureCrosshair = MouseGetPos()
 	_GDIPlus_Startup()
 	Local $hWnd = WinGetHandle($cMuHeader)
 	Local $hBmp = _ScreenCapture_CaptureWndClient("", $hWnd, $CaptureCrosshair[0], $CaptureCrosshair[1], $CaptureCrosshair[0] + 30 - $cMainWndWidth, $CaptureCrosshair[1] + 30 - $cMainWndHeight, True)
-;~ 	GLOBAL $MYI
-;~ 	$MYI += 1
-;~ 	_ScreenCapture_SaveImage("test" & String($MYI) & ".bmp", $hBmp)
 	Local $bitMP = _GDIPlus_BitmapCreateFromHBITMAP($hBmp)
 	Local $aColor = BitXOR(_GDIPlus_BitmapGetPixel($bitMP, $aX, $aY), 0xFF000000)
-;~ 	ToolTip("0x" & Hex($aColor) , 1030, 100)
 	_GDIPlus_ImageDispose($bitMP)
 	_WinAPI_DeleteObject($hBmp)
 	_GDIPlus_Shutdown()
@@ -680,9 +601,9 @@ EndFunc
 Func DeclineRequest()
 	TakeSnapshot()
 	Sleep(500)
-	MouseMove(580, 175, 0)
-	DoSecondaryClick()
-	MouseMove(520, 321, 0)
+	MouseMove($cRequestCancel[0], $cRequestCancel[1], 0)
+	DoMainClick()
+	CenterMouse()
 EndFunc
 
 ;-----------------------------------------------
@@ -866,8 +787,14 @@ Func GoToCoord($aToCoords, $aCanTeleport = 0, $aCenterMouse = True)
 			Sleep($multiplier * 500)
 		EndIf
 
+		Local $TempCoords = GetCurrentPos()
 		$prevCurCoords = $curCoords
-		$curCoords = GetCurrentPos()
+		If $TempCoords <> -1 Then
+			$curCoords = $TempCoords
+		Else
+			$curCoords[0] += $AddX
+			$curCoords[1] += $AddY
+		EndIf
 		$curIter += 1
 	Until (($curCoords[0] == $aToCoords[0]) And ($curCoords[1] == $aToCoords[1])) Or ($curIter == $MaxGotoIter)
 	if $aCenterMouse Then CenterMouse()
@@ -914,6 +841,20 @@ Func DoMouseRoundMove($aStage = 0, $aRadius = 100, $aSleepTime = 2000)
 		Sleep($aSleepTime)
 	EndIf
 EndFunc
+
+Func IsDisconnectWindowOpen($aScale = 5)
+	Local $TempCoords = _TesseractWinCapture($cMuHeader, "", 0, "", 1, $aScale, $cDisconnectWindowRect[0], $cDisconnectWindowRect[1], $cMainWndWidth - $cDisconnectWindowRect[2], $cMainWndHeight - $cDisconnectWindowRect[3], 0, $cCoordWhiteLevel)
+	Local $Words = StringSplit($TempCoords, " ")
+	Local $Found = False
+	For $Word In $Words
+		If StringCompare($Word, "disconnected") == 0 Then
+			$Found = True
+			ExitLoop
+		EndIf
+	Next
+	If $Found Then Return True
+	Return False
+EndFunc
 ;-------------------------------------------------------------------------------------------------------
 ;-------------------------------------------------------------------------------------------------------
 ;-------------------------------------------------------------------------------------------------------
@@ -925,58 +866,6 @@ Func Move($aDirection)
 	Case "up"
 	Case "down"
 	EndSwitch
-EndFunc
-
-Func GetDigit()
-	local $result = ""
-	Local $MyXHistoGramm[12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-	Local $MyYHistoGramm[8]  = [0, 0, 0, 0, 0, 0, 0, 0]
-	For $j = 742 to 753 step 1
-;~ 		For $i = $cCoordXD1[0] to $cCoordXD1[2] step 1
-;~ 		For $i = $cCoordXD2[0] to $cCoordXD2[2] step 1
-;~ 		For $i = $cCoordXD3[0] to $cCoordXD3[2] step 1
-
-;~ 		For $i = $cCoordXD22[0] to $cCoordXD22[2] step 1
-		For $i = $cCoordXD32[0] to $cCoordXD32[2] step 1
-
-;~ 		For $i = $cCoordXD33[0] to $cCoordXD33[2] step 1
-
-;~ 		For $i = $cCoordYD1[0] to $cCoordYD1[2] step 1
-;~ 		For $i = $cCoordYD2[0] to $cCoordYD2[2] step 1
-;~ 		For $i = $cCoordYD3[0] to $cCoordYD3[2] step 1
-
-;~ 		For $i = $cCoordYD22[0] to $cCoordYD22[2] step 1
-;~ 		For $i = $cCoordYD32[0] to $cCoordYD32[2] step 1
-
-;~ 		For $i = $cCoordYD33[0] to $cCoordYD33[2] step 1
-
-			$color = _ColorGetRGB(PixelGetColor($i, $j))
-
-			If _Min(_Min($color[0], $color[1]), $color[2]) > $cCoordWhiteLevel Then
-				$result = $result & "#"
-				$MyXHistoGramm[$j - 742] += 1
-				$MyYHistoGramm[$i - $cCoordXD32[0]] += 1
-;~ 				$result = $result & "1, "
-			Else
-				$result = $result & "_"
-;~ 				$result = $result & "0, "
-			EndIf
-		Next
-		$result = $result & @CRLF
-	Next
-	Local $myLog = "C:\Temp\digits.txt"
-	FileWriteLine($myLog, $result)
-	Local $tempString = ""
-	For $i = 0 To 11 Step 1
-		$tempString &= $MyXHistoGramm[$i] & ", "
-	Next
-	FileWriteLine($myLog, $tempString)
-	$tempString = ""
-	For $i = 0 To 7 Step 1
-		$tempString &= $MyYHistoGramm[$i] & ", "
-	Next
-	FileWriteLine($myLog, $tempString)
-	Return $result
 EndFunc
 
 Func Sign($aWhat)
@@ -991,5 +880,5 @@ EndFunc
 
 
 Func ShowToolTip($aMessage)
-	ToolTip($aMessage, 1034, 100)
+	ToolTip($aMessage, $cMainWndWidth + 10, 100)
 EndFunc
