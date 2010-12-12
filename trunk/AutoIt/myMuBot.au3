@@ -149,7 +149,7 @@ Func DoSetResolution($aWidth = 1024)
 EndFunc
 
 Func SwitchAutoSkill()
-	If $cnAutoSkill == 1 Then Send("{" + $cAutoSkillKey + "}")
+	If $cnAutoSkill == 1 Then Send("{" & $cAutoSkillKey & "}")
 EndFunc
 
 Func DoComeBack()
@@ -376,8 +376,11 @@ While 1
 			If NeedComeBack() Then DoComeBack()
 		EndIf
 		ShowStats()
+		Sleep($cIdleDuration)
+	Else
+		MyProcessGUI()
+		Sleep(100)
 	EndIf
-	MyProcessGUI()
 WEnd
 
 ; Показываем статистику по персонажу
@@ -470,215 +473,212 @@ EndFunc
 
 ; GUI
 Func MyProcessGUI()
-	For $i = 0 To $cIdleDuration Step 1
-		$nMsg = GUIGetMsg()
-		Switch $nMsg
-			Case $GUI_EVENT_CLOSE
-				$GuiShown = False
-				GUISetState(@SW_HIDE)
+	$nMsg = GUIGetMsg()
+	Switch $nMsg
+		Case $GUI_EVENT_CLOSE
+			$GuiShown = False
+			GUISetState(@SW_HIDE)
 
-			Case $CharTypeCombo
-				Local $aCharType = GUICtrlRead($CharTypeCombo)
-				Select
-					Case $aCharType == 'Soul Master'
-						$cCharType = $cctSM
-					Case $aCharType == 'Dark Wizzard'
-						$cCharType = $cctDW
-					Case $aCharType == 'Magic Gladiator'
-						$cCharType = $cctMG
-					Case $aCharType == 'Dark Warrior'
-						$cCharType = $cctDK
-					Case $aCharType == 'Blade Knight'
-						$cCharType = $cctBK
-					Case $aCharType == 'Muse Elf'
-						$cCharType = $cctME
-					Case $aCharType == 'Elf'
-						$cCharType = $cctElf
-				EndSelect
+		Case $CharTypeCombo
+			Local $aCharType = GUICtrlRead($CharTypeCombo)
+			Select
+				Case $aCharType == 'Soul Master'
+					$cCharType = $cctSM
+				Case $aCharType == 'Dark Wizzard'
+					$cCharType = $cctDW
+				Case $aCharType == 'Magic Gladiator'
+					$cCharType = $cctMG
+				Case $aCharType == 'Dark Warrior'
+					$cCharType = $cctDK
+				Case $aCharType == 'Blade Knight'
+					$cCharType = $cctBK
+				Case $aCharType == 'Muse Elf'
+					$cCharType = $cctME
+				Case $aCharType == 'Elf'
+					$cCharType = $cctElf
+			EndSelect
 
-				If ($cCharType == $cctDW) Or ($cCharType == $cctSM) Then
-					GUICtrlSetState($cbManashield, $GUI_ENABLE)
-				Else
-					GUICtrlSetState($cbManashield, $GUI_DISABLE)
-				EndIf
-				If ($cCharType == $cctElf) Or ($cCharType == $cctME) Then
-					GUICtrlSetState($cbRebuff, $GUI_ENABLE)
-					If $cnRebuff Then
-						GUICtrlSetState($lbPartyCount, $GUI_ENABLE)
-						GUICtrlSetState($inPartyCount, $GUI_ENABLE)
-					Else
-						GUICtrlSetState($lbPartyCount, $GUI_DISABLE)
-						GUICtrlSetState($inPartyCount, $GUI_DISABLE)
-					EndIf
-				Else
-					GUICtrlSetState($cbRebuff, $GUI_DISABLE)
-					GUICtrlSetState($lbPartyCount, $GUI_DISABLE)
-					GUICtrlSetState($inPartyCount, $GUI_DISABLE)
-				EndIf
-
-			Case $CharNumberCombo
-				Local $aCharNumber = GUICtrlRead($CharNumberCombo)
-				$cCharNumber = Int($aCharNumber)
-
-			Case $AccPasswordInput
-				Local $aAccPass = GUICtrlRead($AccPasswordInput)
-				$cPassword = $aAccPass
-
-			Case $cbAlcohol
-				Local $acbAlcohol = GUICtrlRead($cbAlcohol)
-				If $acbAlcohol == $GUI_CHECKED Then $cnAlcohol = 1
-				If $acbAlcohol == $GUI_UNCHECKED Then $cnAlcohol = 0
-
-			Case $cbDecline
-				Local $acbDecline = GUICtrlRead($cbDecline)
-				If $acbDecline == $GUI_CHECKED Then $cnDecline = 1
-				If $acbDecline == $GUI_UNCHECKED Then $cnDecline = 0
-
-			Case $cbHeal
-				Local $acbHeal = GUICtrlRead($cbHeal)
-				If $acbHeal == $GUI_CHECKED Then
-					$cnHeal = 1
-					GUICtrlSetState($lbHealthLowLevel, $GUI_ENABLE)
-					GUICtrlSetState($inHealthLowLevel, $GUI_ENABLE)
-				Else
-					$cnHeal = 0
-					GUICtrlSetState($lbHealthLowLevel, $GUI_DISABLE)
-					GUICtrlSetState($inHealthLowLevel, $GUI_DISABLE)
-				EndIf
-
-			Case $cbCoordsChange
-				Local $acbCoordsChange = GUICtrlRead($cbCoordsChange)
-				If $acbCoordsChange == $GUI_CHECKED Then $cnCoordsChanged = 1
-				If $acbCoordsChange == $GUI_UNCHECKED Then $cnCoordsChanged = 0
-
-			Case $cbMana
-				Local $acbMana = GUICtrlRead($cbMana)
-				If $acbMana == $GUI_CHECKED Then
-					$cnMana = 1
-					GUICtrlSetState($lbManaLowLevel, $GUI_ENABLE)
-					GUICtrlSetState($inManaLowLevel, $GUI_ENABLE)
-				Else
-					$cnMana = 0
-					GUICtrlSetState($lbManaLowLevel, $GUI_DISABLE)
-					GUICtrlSetState($inManaLowLevel, $GUI_DISABLE)
-				EndIf
-
-			Case $cbSwitchSkills
-				Local $acbSwitchSkills = GUICtrlRead($cbSwitchSkills)
-				If $acbSwitchSkills == $GUI_CHECKED Then
-					$cnSwitchSkill = 1
-					GUICtrlSetState($lbMainSkillDur, $GUI_ENABLE)
-					GUICtrlSetState($inMainSkillDur, $GUI_ENABLE)
-					GUICtrlSetState($lbSecondarySkillDur, $GUI_ENABLE)
-					GUICtrlSetState($inSecondarySkillDur, $GUI_ENABLE)
-				Else
-					$cnSwitchSkill = 0
-					GUICtrlSetState($lbMainSkillDur, $GUI_DISABLE)
-					GUICtrlSetState($inMainSkillDur, $GUI_DISABLE)
-					GUICtrlSetState($lbSecondarySkillDur, $GUI_DISABLE)
-					GUICtrlSetState($inSecondarySkillDur, $GUI_DISABLE)
-				EndIf
-
-			Case $cbLoot
-				Local $acbLoot = GUICtrlRead($cbLoot)
-				If $acbLoot == $GUI_CHECKED Then
-					$cnLoot = 1
-					GUICtrlSetState($lbLootDur, $GUI_ENABLE)
-					GUICtrlSetState($inLootDur, $GUI_ENABLE)
-				Else
-					$cnLoot = 0
-					GUICtrlSetState($lbLootDur, $GUI_DISABLE)
-					GUICtrlSetState($inLootDur, $GUI_DISABLE)
-				EndIf
-
-			Case $cbTurn
-				Local $acbTurn = GUICtrlRead($cbTurn)
-				If $acbTurn == $GUI_CHECKED Then $cnTurn = 1
-				If $acbTurn == $GUI_UNCHECKED Then $cnTurn = 0
-
-			Case $cbAutoSkill
-				Local $acbAutoSkill = GUICtrlRead($cbAutoSkill)
-				If $acbAutoSkill == $GUI_CHECKED Then $cnAutoSkill = 1
-				If $acbAutoSkill == $GUI_UNCHECKED Then $cnAutoSkill = 0
-
-			Case $cbComeBack
-				Local $acbComeBack = GUICtrlRead($cbComeBack)
-				If $acbComeBack == $GUI_CHECKED Then
-					$cnComeBack = 1
-					GUICtrlSetState($lbComeBackDur, $GUI_ENABLE)
-					GUICtrlSetState($inComeBackDur, $GUI_ENABLE)
-					GUICtrlSetState($cbNeedMove, $GUI_ENABLE)
-				Else
-					$cnComeBack = 0
-					GUICtrlSetState($lbComeBackDur, $GUI_DISABLE)
-					GUICtrlSetState($inComeBackDur, $GUI_DISABLE)
-					GUICtrlSetState($cbNeedMove, $GUI_DISABLE)
-				EndIf
-
-			Case $cbNeedMove
-				Local $acbNeedMove = GUICtrlRead($cbNeedMove)
-				If $acbNeedMove == $GUI_CHECKED Then $cnMove = 1
-				If $acbNeedMove == $GUI_UNCHECKED Then $cnMove = 0
-
-			Case $cbManashield
-				Local $acbManashield = GUICtrlRead($cbManashield)
-				If $acbManashield == $GUI_CHECKED Then $cnManashield = 1
-				If $acbManashield == $GUI_UNCHECKED Then $cnManashield = 0
-
-			Case $cbRebuff
-				Local $acbRebuff = GUICtrlRead($cbRebuff)
-				If $acbRebuff == $GUI_CHECKED Then
-					$cnRebuff = 1
+			If ($cCharType == $cctDW) Or ($cCharType == $cctSM) Then
+				GUICtrlSetState($cbManashield, $GUI_ENABLE)
+			Else
+				GUICtrlSetState($cbManashield, $GUI_DISABLE)
+			EndIf
+			If ($cCharType == $cctElf) Or ($cCharType == $cctME) Then
+				GUICtrlSetState($cbRebuff, $GUI_ENABLE)
+				If $cnRebuff Then
 					GUICtrlSetState($lbPartyCount, $GUI_ENABLE)
 					GUICtrlSetState($inPartyCount, $GUI_ENABLE)
 				Else
-					$cnRebuff = 0
 					GUICtrlSetState($lbPartyCount, $GUI_DISABLE)
 					GUICtrlSetState($inPartyCount, $GUI_DISABLE)
 				EndIf
+			Else
+				GUICtrlSetState($cbRebuff, $GUI_DISABLE)
+				GUICtrlSetState($lbPartyCount, $GUI_DISABLE)
+				GUICtrlSetState($inPartyCount, $GUI_DISABLE)
+			EndIf
 
-			Case $inIdleDuration
-				Local $ainIdleDuration = GUICtrlRead($inIdleDuration)
-				$cIdleDuration = Int($ainIdleDuration)
+		Case $CharNumberCombo
+			Local $aCharNumber = GUICtrlRead($CharNumberCombo)
+			$cCharNumber = Int($aCharNumber)
 
-			Case $inMainSkillDur
-				Local $ainMainSkillDur = GUICtrlRead($inMainSkillDur)
-				$cMainSkillDuration = Int($ainMainSkillDur)
+		Case $AccPasswordInput
+			Local $aAccPass = GUICtrlRead($AccPasswordInput)
+			$cPassword = $aAccPass
 
-			Case $inSecondarySkillDur
-				Local $ainSecondarySkillDur = GUICtrlRead($inSecondarySkillDur)
-				$cSecondarySkillDuration = Int($ainSecondarySkillDur)
+		Case $cbAlcohol
+			Local $acbAlcohol = GUICtrlRead($cbAlcohol)
+			If $acbAlcohol == $GUI_CHECKED Then $cnAlcohol = 1
+			If $acbAlcohol == $GUI_UNCHECKED Then $cnAlcohol = 0
 
-			Case $inLootDur
-				Local $ainLootDur = GUICtrlRead($inLootDur)
-				$cLootIdleDuration = Int($ainLootDur)
+		Case $cbDecline
+			Local $acbDecline = GUICtrlRead($cbDecline)
+			If $acbDecline == $GUI_CHECKED Then $cnDecline = 1
+			If $acbDecline == $GUI_UNCHECKED Then $cnDecline = 0
 
-			Case $inComeBackDur
-				Local $ainComeBackDur = GUICtrlRead($inComeBackDur)
-				$cComeBackDuration = Int($ainComeBackDur)
+		Case $cbHeal
+			Local $acbHeal = GUICtrlRead($cbHeal)
+			If $acbHeal == $GUI_CHECKED Then
+				$cnHeal = 1
+				GUICtrlSetState($lbHealthLowLevel, $GUI_ENABLE)
+				GUICtrlSetState($inHealthLowLevel, $GUI_ENABLE)
+			Else
+				$cnHeal = 0
+				GUICtrlSetState($lbHealthLowLevel, $GUI_DISABLE)
+				GUICtrlSetState($inHealthLowLevel, $GUI_DISABLE)
+			EndIf
 
-			Case $inHealthLowLevel
-				Local $ainHealthLowLevel = GUICtrlRead($inHealthLowLevel)
-				$cHealthLowLevel = Int($ainHealthLowLevel)
+		Case $cbCoordsChange
+			Local $acbCoordsChange = GUICtrlRead($cbCoordsChange)
+			If $acbCoordsChange == $GUI_CHECKED Then $cnCoordsChanged = 1
+			If $acbCoordsChange == $GUI_UNCHECKED Then $cnCoordsChanged = 0
 
-			Case $inManaLowLevel
-				Local $ainManaLowLevel = GUICtrlRead($inManaLowLevel)
-				$cManaLowLevel = Int($ainManaLowLevel)
+		Case $cbMana
+			Local $acbMana = GUICtrlRead($cbMana)
+			If $acbMana == $GUI_CHECKED Then
+				$cnMana = 1
+				GUICtrlSetState($lbManaLowLevel, $GUI_ENABLE)
+				GUICtrlSetState($inManaLowLevel, $GUI_ENABLE)
+			Else
+				$cnMana = 0
+				GUICtrlSetState($lbManaLowLevel, $GUI_DISABLE)
+				GUICtrlSetState($inManaLowLevel, $GUI_DISABLE)
+			EndIf
 
-			Case $inPartyCount
-				Local $ainPartyCount = GUICtrlRead($inPartyCount)
-				$crCount = Int($ainPartyCount)
+		Case $cbSwitchSkills
+			Local $acbSwitchSkills = GUICtrlRead($cbSwitchSkills)
+			If $acbSwitchSkills == $GUI_CHECKED Then
+				$cnSwitchSkill = 1
+				GUICtrlSetState($lbMainSkillDur, $GUI_ENABLE)
+				GUICtrlSetState($inMainSkillDur, $GUI_ENABLE)
+				GUICtrlSetState($lbSecondarySkillDur, $GUI_ENABLE)
+				GUICtrlSetState($inSecondarySkillDur, $GUI_ENABLE)
+			Else
+				$cnSwitchSkill = 0
+				GUICtrlSetState($lbMainSkillDur, $GUI_DISABLE)
+				GUICtrlSetState($inMainSkillDur, $GUI_DISABLE)
+				GUICtrlSetState($lbSecondarySkillDur, $GUI_DISABLE)
+				GUICtrlSetState($inSecondarySkillDur, $GUI_DISABLE)
+			EndIf
 
-			Case $coLocation
-				$cLocation = GUICtrlRead($coLocation)
+		Case $cbLoot
+			Local $acbLoot = GUICtrlRead($cbLoot)
+			If $acbLoot == $GUI_CHECKED Then
+				$cnLoot = 1
+				GUICtrlSetState($lbLootDur, $GUI_ENABLE)
+				GUICtrlSetState($inLootDur, $GUI_ENABLE)
+			Else
+				$cnLoot = 0
+				GUICtrlSetState($lbLootDur, $GUI_DISABLE)
+				GUICtrlSetState($inLootDur, $GUI_DISABLE)
+			EndIf
 
-			Case $coServerNum
-				Local $ainServerNum = GUICtrlRead($coServerNum)
-				$cServerNum = Int($ainServerNum)
+		Case $cbTurn
+			Local $acbTurn = GUICtrlRead($cbTurn)
+			If $acbTurn == $GUI_CHECKED Then $cnTurn = 1
+			If $acbTurn == $GUI_UNCHECKED Then $cnTurn = 0
 
-		EndSwitch
-		Sleep(1)
-	Next
+		Case $cbAutoSkill
+			Local $acbAutoSkill = GUICtrlRead($cbAutoSkill)
+			If $acbAutoSkill == $GUI_CHECKED Then $cnAutoSkill = 1
+			If $acbAutoSkill == $GUI_UNCHECKED Then $cnAutoSkill = 0
+
+		Case $cbComeBack
+			Local $acbComeBack = GUICtrlRead($cbComeBack)
+			If $acbComeBack == $GUI_CHECKED Then
+				$cnComeBack = 1
+				GUICtrlSetState($lbComeBackDur, $GUI_ENABLE)
+				GUICtrlSetState($inComeBackDur, $GUI_ENABLE)
+				GUICtrlSetState($cbNeedMove, $GUI_ENABLE)
+			Else
+				$cnComeBack = 0
+				GUICtrlSetState($lbComeBackDur, $GUI_DISABLE)
+				GUICtrlSetState($inComeBackDur, $GUI_DISABLE)
+				GUICtrlSetState($cbNeedMove, $GUI_DISABLE)
+			EndIf
+
+		Case $cbNeedMove
+			Local $acbNeedMove = GUICtrlRead($cbNeedMove)
+			If $acbNeedMove == $GUI_CHECKED Then $cnMove = 1
+			If $acbNeedMove == $GUI_UNCHECKED Then $cnMove = 0
+
+		Case $cbManashield
+			Local $acbManashield = GUICtrlRead($cbManashield)
+			If $acbManashield == $GUI_CHECKED Then $cnManashield = 1
+			If $acbManashield == $GUI_UNCHECKED Then $cnManashield = 0
+
+		Case $cbRebuff
+			Local $acbRebuff = GUICtrlRead($cbRebuff)
+			If $acbRebuff == $GUI_CHECKED Then
+				$cnRebuff = 1
+				GUICtrlSetState($lbPartyCount, $GUI_ENABLE)
+				GUICtrlSetState($inPartyCount, $GUI_ENABLE)
+			Else
+				$cnRebuff = 0
+				GUICtrlSetState($lbPartyCount, $GUI_DISABLE)
+				GUICtrlSetState($inPartyCount, $GUI_DISABLE)
+			EndIf
+
+		Case $inIdleDuration
+			Local $ainIdleDuration = GUICtrlRead($inIdleDuration)
+			$cIdleDuration = Int($ainIdleDuration)
+
+		Case $inMainSkillDur
+			Local $ainMainSkillDur = GUICtrlRead($inMainSkillDur)
+			$cMainSkillDuration = Int($ainMainSkillDur)
+
+		Case $inSecondarySkillDur
+			Local $ainSecondarySkillDur = GUICtrlRead($inSecondarySkillDur)
+			$cSecondarySkillDuration = Int($ainSecondarySkillDur)
+
+		Case $inLootDur
+			Local $ainLootDur = GUICtrlRead($inLootDur)
+			$cLootIdleDuration = Int($ainLootDur)
+
+		Case $inComeBackDur
+			Local $ainComeBackDur = GUICtrlRead($inComeBackDur)
+			$cComeBackDuration = Int($ainComeBackDur)
+
+		Case $inHealthLowLevel
+			Local $ainHealthLowLevel = GUICtrlRead($inHealthLowLevel)
+			$cHealthLowLevel = Int($ainHealthLowLevel)
+
+		Case $inManaLowLevel
+			Local $ainManaLowLevel = GUICtrlRead($inManaLowLevel)
+			$cManaLowLevel = Int($ainManaLowLevel)
+
+		Case $inPartyCount
+			Local $ainPartyCount = GUICtrlRead($inPartyCount)
+			$crCount = Int($ainPartyCount)
+
+		Case $coLocation
+			$cLocation = GUICtrlRead($coLocation)
+
+		Case $coServerNum
+			Local $ainServerNum = GUICtrlRead($coServerNum)
+			$cServerNum = Int($ainServerNum)
+
+	EndSwitch
 EndFunc
 
 Func MyGUIHideShow()
@@ -838,7 +838,7 @@ Func MyGUICreate()
 	$lbLocation = GUICtrlCreateLabel("Имя локации", 255, 353, 71, 17)
 	GUICtrlSetTip(-1, "Для умной хотьбы и телепортации")
 	$coLocation = GUICtrlCreateCombo("", 408, 348, 121, 25, BitOR($CBS_DROPDOWN,$CBS_AUTOHSCROLL))
-	GUICtrlSetData(-1, "Lorencia|Dungeon|Davias|Noria|Lost Tower|Arena|Atlans|Tarkan|Davil Square|Icarus|Blood Castle|Chaos Castle|Kalima|CryWolf|Aida|Kantru|Kantru 1|Kantru Event|Illusion Tample|Elbeland|Raclion|Raclion Event|Vulcano|Duel Arena", "")
+	GUICtrlSetData(-1, "Lorencia|Dungeon|Davias|Noria|Lost Tower|Arena|Atlans|Tarkan|Davil Square|Icarus|Blood Castle|Chaos Castle|Kalima|CryWolf|Aida|Kantru|Kantru 1|Kantru Event|Illusion Tample|Elbeland|Raclion|Raclion Event|Vulcano|Duel Arena", String($cLocation))
 
     $lbServerNum = GUICtrlCreateLabel("Номер сервера", 255, 378, 83, 17)
 	GUICtrlSetTip(-1, "Для реконнекта")
