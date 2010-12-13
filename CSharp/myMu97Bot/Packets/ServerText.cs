@@ -7,7 +7,7 @@ namespace DudEeer.myMu97Bot.Packets
         public string Text { get; set; }
         public ConsoleColor TextColor { get; set; }
 
-        ServerText(byte[] aBuffer)
+        public ServerText(byte[] aBuffer)
             : base(aBuffer)
         {
             if (aBuffer.Length < 5) throw new Exception("Too short packet.");

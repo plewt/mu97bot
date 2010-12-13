@@ -2,12 +2,12 @@
 
 namespace DudEeer.myMu97Bot.Packets
 {
-    public class PublicSpeach : CommonServerToClientPacket
+    public class PublicSpeech : CommonServerToClientPacket
     {
         public string Name { get; set; }
         public string Message { get; set; }
 
-        public PublicSpeach(byte[] aBuffer)
+        public PublicSpeech(byte[] aBuffer)
             : base(aBuffer)
         {
             if (aBuffer.Length < 13) throw new Exception("Too short packet.");

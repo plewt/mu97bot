@@ -98,12 +98,16 @@
     <Compile Include="NetworkPreferencesForm.Designer.cs">
       <DependentUpon>NetworkPreferencesForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Packets\CharacterList.cs" />
     <Compile Include="Packets\DamageReceived.cs" />
     <Compile Include="Packets\Death.cs" />
+    <Compile Include="Packets\MeetPlayer.cs" />
     <Compile Include="Packets\PacketCommon.cs" />
-    <Compile Include="Packets\PublicSpeach.cs" />
+    <Compile Include="Packets\PlayerPosition.cs" />
+    <Compile Include="Packets\PublicSpeech.cs" />
     <Compile Include="Packets\PutItem.cs" />
     <Compile Include="Packets\ServerText.cs" />
+    <Compile Include="Packets\StopMoving.cs" />
     <Compile Include="Packets\TraiderInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
