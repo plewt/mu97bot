@@ -5,36 +5,36 @@ using System.Text;
 
 namespace DudEeer.myMu97Bot.Packets
 {
-    class MeetPlayer : CommonServerToClientPacket
-    {
-        // C2 NOT YET IMPLEMENTED
-/*        private const int CharacterInfoLength = 26;
-
-        public class CharacterInfo
+// C2 NOT YET IMPLEMENTED
+    /*    class MeetPlayer : CommonServerToClientPacket
         {
-            public string Name { get; set; }
-            public int Level { get; set; }
-            // futher bytes not processed
-        }
+            private const int CharacterInfoLength = 26;
 
-        public List<CharacterInfo> CharList = new List<CharacterInfo>();
-
-        public MeetPlayer(byte[] aBuffer)
-            : base(aBuffer)
-        {
-            if (aBuffer.Length < 4) throw new Exception("Too short packet.");
-
-            for(int i = 0; i < aBuffer[3]; i++)
+            public class CharacterInfo
             {
-                CharacterInfo TempChar = new CharacterInfo();
+                public string Name { get; set; }
+                public int Level { get; set; }
+                // futher bytes not processed
+            }
 
-                char[] chName = new char[10];
-                Array.Copy(aBuffer, 4 + CharacterInfoLength * i + 1, chName, 0, 10);
-                TempChar.Name = (new string(chName)).Trim('\0');
-                TempChar.Level = aBuffer[4 + CharacterInfoLength * i + 12];
+            public List<CharacterInfo> CharList = new List<CharacterInfo>();
 
-                this.CharList.Add(TempChar);
+            public MeetPlayer(byte[] aBuffer)
+                : base(aBuffer)
+            {
+                if (aBuffer.Length < 4) throw new Exception("Too short packet.");
+
+                for(int i = 0; i < aBuffer[3]; i++)
+                {
+                    CharacterInfo TempChar = new CharacterInfo();
+
+                    char[] chName = new char[10];
+                    Array.Copy(aBuffer, 4 + CharacterInfoLength * i + 1, chName, 0, 10);
+                    TempChar.Name = (new string(chName)).Trim('\0');
+                    TempChar.Level = aBuffer[4 + CharacterInfoLength * i + 12];
+
+                    this.CharList.Add(TempChar);
+                }
             }
         }*/
-    }
 }
