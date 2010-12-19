@@ -2,7 +2,7 @@
 
 namespace DudEeer.myMu97Bot.Packets
 {
-    class Death : CommonServerToClientPacket
+    public class Death : CommonServerToClientPacket
     {
         public int LivingId { get; set; }
         public int KillerId { get; set; }

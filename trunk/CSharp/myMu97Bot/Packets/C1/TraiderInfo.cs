@@ -2,7 +2,7 @@
 
 namespace DudEeer.myMu97Bot.Packets
 {
-    class TraiderInfo : CommonServerToClientPacket
+    public class TraiderInfo : CommonServerToClientPacket
     {
         public string Name { get; set; }
         public int Level { get; set; }

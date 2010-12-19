@@ -53,33 +53,40 @@ namespace DudEeer.myMu97Bot
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            MyProtoAnalizer.OnPublicSpeach += (new PublicSpeachEventHandler(MyOnPublicSpeach));
+            MyProtoAnalizer.OnPublicSpeach += (new PublicSpeechEventHandler(MyOnPublicSpeach));
             MyProtoAnalizer.OnCharacterList += (new CharacterListEventHandler(MyOnCharacterList));
-            MyProtoAnalizer.OnPlayerPosition += (new PlayerPositionEventHandler(MyOnPlayerPosition));
+            MyProtoAnalizer.OnLivingPosition += (new LivingPositionEventHandler(MyOnPlayerPosition));
+            MyProtoAnalizer.OnGameServerAnswer += (new GameServerAnswerEventHandler(MyOnGameServerAnswer));
             MyProtoAnalizer.OnStopMoving += (new StopMovingEventHandler(MyOnStopMoving));
         }
-
-        public void MyOnStopMoving(int aLivingId, byte aX, byte aY, byte aOpt)
+        public void MyOnStopMoving(StopMoving aStopMoving)
         {
-            listBox1.Items.Add(string.Format("[STOP MOVING] LivingId : {0}, X : {1}, Y : {2}, Opt {3}", aLivingId, aX, aY, aOpt));
+            listBox1.Items.Insert(0, string.Format("[STOP MOVING] LivingId : {0}, X : {1}, Y : {2}, Opt : {3}", aStopMoving.LivingId, aStopMoving.X, aStopMoving.Y, aStopMoving.Opt));
         }
-        public void MyOnPlayerPosition(int aPlayerId, int aWorldId)
-        {
-            listBox1.Items.Add(string.Format("[PLAYER POSITION] PlayerId : {0}, WorldId : {1}", aPlayerId, aWorldId));
-        }
-
-        public void MyOnCharacterList(List<CharacterList.CharacterInfo> aList)
-        {
-            listBox1.Items.Add("[CHARACTERS LIST]:");
-            foreach (CharacterList.CharacterInfo CharInfo in aList)
+        public void MyOnGameServerAnswer(GameServerAnswer aAnswer)
+        { 
+            if (aAnswer.SubType == GameServerAnswer.SubTypes.Hello)
             {
-                listBox1.Items.Add(string.Format("[CHARACTERS LIST] {0} : {1}", CharInfo.Name, CharInfo.Level));                                
+                listBox1.Items.Insert(0, string.Format("[GS HELLO] PlayerId : {0}, Version {1}", aAnswer.HelloAnswer.PlayerId, aAnswer.HelloAnswer.Version));
+            }
+        }
+        public void MyOnPlayerPosition(LivingPosition aPlayerPosition)
+        {
+            listBox1.Items.Insert(0, string.Format("[LIVING POSITION] LivingId : {0}, X : {1}, Y : {2}, Rotation : {3}", aPlayerPosition.PlayerId, aPlayerPosition.X, aPlayerPosition.Y, aPlayerPosition.Rotation));
+        }
+
+        public void MyOnCharacterList(CharacterList aCharacterList)
+        {
+            listBox1.Items.Insert(0, "[CHARACTERS LIST]:");
+            foreach (CharacterList.CharacterInfo CharInfo in aCharacterList.CharList)
+            {
+                listBox1.Items.Insert(0, string.Format("[CHARACTERS LIST] {0} : {1}", CharInfo.Name, CharInfo.Level));                                
             }
         }
 
-        public void MyOnPublicSpeach(string aName, string aText)
+        public void MyOnPublicSpeach(PublicSpeech aPublicSpeech)
         {
-            listBox1.Items.Add(string.Format("[PUBLIC SPEACH] {0} : {1}", aName, aText));
+            listBox1.Items.Insert(0, string.Format("[PUBLIC SPEACH] {0} : {1}", aPublicSpeech.Name, aPublicSpeech.Message));
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
