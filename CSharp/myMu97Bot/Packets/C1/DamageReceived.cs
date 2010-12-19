@@ -2,7 +2,7 @@
 
 namespace DudEeer.myMu97Bot.Packets
 {
-    class DamageReceived : CommonServerToClientPacket
+    public class DamageReceived : CommonServerToClientPacket
     {
         public int LivingId { get; set; }
         public int Damage { get; set; }

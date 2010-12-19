@@ -2,7 +2,7 @@
 
 namespace DudEeer.myMu97Bot.Packets
 {
-    class StopMoving : CommonServerToClientPacket
+    public class StopMoving : CommonServerToClientPacket
     {
         public int LivingId { get; set; }
         public byte X { get; set; }

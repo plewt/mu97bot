@@ -9,7 +9,7 @@
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DudEeer.myMu97Bot</RootNamespace>
-    <AssemblyName>DudEeer.myMu97Bot</AssemblyName>
+    <AssemblyName>Mu97Bot</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -98,17 +98,18 @@
     <Compile Include="NetworkPreferencesForm.Designer.cs">
       <DependentUpon>NetworkPreferencesForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Packets\CharacterList.cs" />
-    <Compile Include="Packets\DamageReceived.cs" />
-    <Compile Include="Packets\Death.cs" />
-    <Compile Include="Packets\MeetPlayer.cs" />
-    <Compile Include="Packets\PacketCommon.cs" />
-    <Compile Include="Packets\PlayerPosition.cs" />
-    <Compile Include="Packets\PublicSpeech.cs" />
-    <Compile Include="Packets\PutItem.cs" />
-    <Compile Include="Packets\ServerText.cs" />
-    <Compile Include="Packets\StopMoving.cs" />
-    <Compile Include="Packets\TraiderInfo.cs" />
+    <Compile Include="Packets\C1\CharacterList.cs" />
+    <Compile Include="Packets\C1\DamageReceived.cs" />
+    <Compile Include="Packets\C1\Death.cs" />
+    <Compile Include="Packets\C1\GameServerAnswer.cs" />
+    <Compile Include="Packets\C2\MeetPlayer.cs" />
+    <Compile Include="Packets\C1\PacketCommon.cs" />
+    <Compile Include="Packets\C1\LivingPosition.cs" />
+    <Compile Include="Packets\C1\PublicSpeech.cs" />
+    <Compile Include="Packets\C1\PutItem.cs" />
+    <Compile Include="Packets\C1\ServerText.cs" />
+    <Compile Include="Packets\C1\StopMoving.cs" />
+    <Compile Include="Packets\C1\TraiderInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="MainForm.resx">

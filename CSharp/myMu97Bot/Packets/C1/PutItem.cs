@@ -2,7 +2,7 @@
 
 namespace DudEeer.myMu97Bot.Packets
 {
-    class PutItem : CommonServerToClientPacket
+    public class PutItem : CommonServerToClientPacket
     {
         public byte Position { get; set; }
         public byte Item { get; set; }

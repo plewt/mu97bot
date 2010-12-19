@@ -4,6 +4,7 @@ using System.Net;
 using SharpPcap;
 using PacketDotNet;
 using DudEeer.myMu97Bot.Packets;
+using System.IO;
 
 namespace DudEeer.myMu97Bot
 {
@@ -28,9 +29,12 @@ namespace DudEeer.myMu97Bot
         private string sSelfAddress;
         private States stState = States.Stopped;
         private LivePcapDevice curDevice;
+#if LOGPACKETS
+        private TextWriter MyWriter = new StreamWriter("outgoing.txt", true);
+#endif
 
         #region Events
-        public event PublicSpeachEventHandler OnPublicSpeach;
+        public event PublicSpeechEventHandler OnPublicSpeach;
         public event ServerTextEventHandler OnServerText;
         public event DamageReceivedEventHandler OnDamageReceived;
         public event DeathEventEventHandler OnDeath;
@@ -39,8 +43,9 @@ namespace DudEeer.myMu97Bot
         public event OpenCreateGuildWindowEventHandler OnOpenCreateGuildWindow;
         public event OpenVaultWindowEventHandler OnOpenVaultWindow;
         public event StopMovingEventHandler OnStopMoving;
-        public event PlayerPositionEventHandler OnPlayerPosition;
+        public event LivingPositionEventHandler OnLivingPosition;
         public event CharacterListEventHandler OnCharacterList;
+        public event GameServerAnswerEventHandler OnGameServerAnswer;
         #endregion
 
         public States State { get {return stState; } }
@@ -117,34 +122,34 @@ namespace DudEeer.myMu97Bot
                     switch (cstcpTemp.ClassType)
                     {
                         case PacketClass.C1:
-                            switch (cstcpTemp.MesType)
+                            switch (cstcpTemp.MesTypeC1)
                             {
                                 case MessageTypeC1.PublicSpeech:
                                     if (OnPublicSpeach != null)
                                     {
                                         PublicSpeech pspTemp = new PublicSpeech(aBuffer);
-                                        AsyncHelper.FireAndForget(OnPublicSpeach, pspTemp.Name, pspTemp.Message);
+                                        AsyncHelper.FireAndForget(OnPublicSpeach, pspTemp);
                                     }
                                     break;
                                 case MessageTypeC1.CharacterList:
                                     if (OnCharacterList != null)
                                     {
                                         CharacterList clTemp = new CharacterList(aBuffer);
-                                        AsyncHelper.FireAndForget(OnCharacterList, clTemp.CharList);
+                                        AsyncHelper.FireAndForget(OnCharacterList, clTemp);
                                     }
                                     break;
                                 case MessageTypeC1.DamageReceived:
                                     if (OnDamageReceived != null)
                                     {
                                         DamageReceived drTemp = new DamageReceived(aBuffer);
-                                        AsyncHelper.FireAndForget(OnDamageReceived, drTemp.LivingId, drTemp.Damage, drTemp.Critical);
+                                        AsyncHelper.FireAndForget(OnDamageReceived, drTemp);
                                     }
                                     break;
                                 case MessageTypeC1.Death:
                                     if (OnDeath != null)
                                     {
                                         Death dTemp = new Death(aBuffer);
-                                        AsyncHelper.FireAndForget(OnDeath, dTemp.LivingId, dTemp.KillerId);
+                                        AsyncHelper.FireAndForget(OnDeath, dTemp);
                                     }
                                     break;
                                 case MessageTypeC1.OpenCreateGuildWindow:
@@ -156,42 +161,55 @@ namespace DudEeer.myMu97Bot
                                         AsyncHelper.FireAndForget(OnOpenVaultWindow);
                                     break;
                                 case MessageTypeC1.PlayerPosition:
-                                    if (OnPlayerPosition != null)
+                                    if (OnLivingPosition != null)
                                     {
-                                        PlayerPosition ppTemp = new PlayerPosition(aBuffer);
-                                        AsyncHelper.FireAndForget(OnPlayerPosition, ppTemp.MapNumber, ppTemp.PlayerId);
+                                        LivingPosition ppTemp = new LivingPosition(aBuffer);
+                                        AsyncHelper.FireAndForget(OnLivingPosition, ppTemp);
                                     }
                                     break;
                                 case MessageTypeC1.PutItem:
                                     if (OnPutItem != null)
                                     {
                                         PutItem piTemp = new PutItem(aBuffer);
-                                        AsyncHelper.FireAndForget(OnPutItem, piTemp.Position, piTemp.Item, piTemp.Options);
+                                        AsyncHelper.FireAndForget(OnPutItem, piTemp);
                                     }
                                     break;
                                 case MessageTypeC1.ServerText:
                                     if (OnServerText != null)
                                     {
                                         ServerText stTemp = new ServerText(aBuffer);
-                                        AsyncHelper.FireAndForget(OnServerText, stTemp.TextColor, stTemp.Text);
-                                    }
-                                    break;
-                                case MessageTypeC1.StopMoving:
-                                    if (OnStopMoving != null)
-                                    {
-                                        StopMoving smTemp = new StopMoving(aBuffer);
-                                        AsyncHelper.FireAndForget(OnStopMoving, smTemp.LivingId, smTemp.X, smTemp.Y, smTemp.Opt);
+                                        AsyncHelper.FireAndForget(OnServerText, stTemp);
                                     }
                                     break;
                                 case MessageTypeC1.TraiderInfo:
                                     if (OnTraiderInfo != null)
                                     {
                                         TraiderInfo tiTemp = new TraiderInfo(aBuffer);
-                                        AsyncHelper.FireAndForget(OnTraiderInfo, tiTemp.Name, tiTemp.Level, tiTemp.GuildId);
+                                        AsyncHelper.FireAndForget(OnTraiderInfo, tiTemp);
+                                    }
+                                    break;
+                                case MessageTypeC1.StopMoving:
+                                    if (OnStopMoving != null)
+                                    {
+                                        StopMoving smTemp = new StopMoving(aBuffer);
+                                        AsyncHelper.FireAndForget(OnStopMoving, smTemp);
+                                    }
+                                    break;                                    
+                                case MessageTypeC1.GameServerAnswer:
+                                    if (OnGameServerAnswer != null)
+                                    {
+                                        GameServerAnswer gsaTemp = new GameServerAnswer(aBuffer);
+                                        AsyncHelper.FireAndForget(OnGameServerAnswer, gsaTemp);
                                     }
                                     break;
                             }
                             break;
+                    }
+                    if ((cstcpTemp.ClassType != PacketClass.Unknown) && (cstcpTemp.Length < aBuffer.Length))
+                    {
+                        byte[] subArray = new byte[aBuffer.Length - cstcpTemp.Length];
+                        Array.Copy(aBuffer, cstcpTemp.Length, subArray, 0, aBuffer.Length - cstcpTemp.Length);
+                        AnalyzePacket(subArray, aType);
                     }
                     break;
             }
@@ -214,25 +232,48 @@ namespace DudEeer.myMu97Bot
                 Packet MyPacket = Packet.ParsePacket(aArgs.Packet);
                 TcpPacket MyTcpPacket = TcpPacket.GetEncapsulated(MyPacket);
                 IpPacket MyIpPacket = IpPacket.GetEncapsulated(MyPacket);
-                
+                if (MyTcpPacket.PayloadData.Length == 0) return;
 
                 PacketDirection CurDirection;
                 string PacketFrom = MyIpPacket.SourceAddress.ToString();
                 string PacketTo = MyIpPacket.DestinationAddress.ToString();
-                
                 if ((PacketFrom == DevAddress) && (PacketTo == ipServerAddress.ToString()))
                     CurDirection = PacketDirection.ClientToServer;
                 else if ((PacketFrom == ipServerAddress.ToString()) && (PacketTo == DevAddress))
                     CurDirection = PacketDirection.ServerToClient;
                 else return;
 
-/*                if ((LastAck == MyTcpPacket.AcknowledgmentNumber) && (LastSeq == MyTcpPacket.SequenceNumber)) return;
+                if ((LastAck == MyTcpPacket.AcknowledgmentNumber) && (LastSeq == MyTcpPacket.SequenceNumber)) return;
                 else
                 {
                     LastAck = MyTcpPacket.AcknowledgmentNumber;
                     LastSeq = MyTcpPacket.SequenceNumber;
-                }*/
-                
+                }
+
+
+#if LOGPACKETS
+                if (CurDirection == PacketDirection.ServerToClient)
+                {
+                    string MyOutString = "";
+                    foreach (byte MyByte in MyTcpPacket.PayloadData)
+                    {
+                        MyOutString = String.Format("{0} {1:X2}", MyOutString, MyByte);
+                    }
+                    MyWriter.WriteLine("S->C " + MyOutString);
+                    MyWriter.Flush();
+                }
+                else
+                {
+                    string MyOutString = "";
+                    foreach (byte MyByte in MyTcpPacket.PayloadData)
+                    {
+                        MyOutString = String.Format("{0} {1:X2}", MyOutString, MyByte);
+                    }
+                    MyWriter.WriteLine("C->S " + MyOutString);
+                    MyWriter.Flush();
+                }
+#endif
+
 
                 if (MyTcpPacket.PayloadData != null)
                     AnalyzePacket(MyTcpPacket.PayloadData, CurDirection);
