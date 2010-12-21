@@ -11,6 +11,8 @@ namespace DudEeer.myMu97Bot.Packets
         PlayerPosition = 0x10,
         DamageReceived = 0x11,
         Death = 0x17,
+        UpdateHealth = 0x26,
+        UpdateMana = 0x27,
         PutItem = 0x32,
         TraiderInfo = 0x37,
         OpenCreateGuildWindow = 0x55, // no params
@@ -48,6 +50,8 @@ namespace DudEeer.myMu97Bot.Packets
     public delegate void LivingPositionEventHandler(LivingPosition aPlayerPosition);
     public delegate void CharacterListEventHandler(CharacterList aCharList);
     public delegate void GameServerAnswerEventHandler(GameServerAnswer aGSAnswer);
+    public delegate void UpdateHealthEventHandler(UpdateHealth aUpdateHealth);
+    public delegate void UpdateManaEventHandler(UpdateMana aUpdateMana);
 
     public enum PacketClass
     {
