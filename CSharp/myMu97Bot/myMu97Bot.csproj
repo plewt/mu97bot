@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{C69B03B7-5CBA-4BC5-86F2-910FB4AFD539}</ProjectGuid>
     <OutputType>WinExe</OutputType>
@@ -13,6 +13,7 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
     <PublishUrl>\\VMWARE-GAMES-2\ForTests\muBotPublish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Unc</InstallFrom>
@@ -28,7 +29,6 @@
     <ApplicationRevision>1</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
-    <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -61,16 +61,16 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PacketDotNet, Version=0.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="PacketDotNet, Version=0.7.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SharpPcap-3_3_0\Release\PacketDotNet.dll</HintPath>
+      <HintPath>..\SharpPcap\SharpPcap-3.4.0\Release\PacketDotNet.dll</HintPath>
     </Reference>
-    <Reference Include="SharpPcap, Version=3.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="SharpPcap, Version=3.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SharpPcap-3_3_0\Release\SharpPcap.dll</HintPath>
+      <HintPath>..\SharpPcap\SharpPcap-3.4.0\Release\SharpPcap.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -85,6 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common.cs" />
+    <Compile Include="GameObjects\PlayerInfo.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -102,6 +103,8 @@
     <Compile Include="Packets\C1\DamageReceived.cs" />
     <Compile Include="Packets\C1\Death.cs" />
     <Compile Include="Packets\C1\GameServerAnswer.cs" />
+    <Compile Include="Packets\C1\UpdateHealth.cs" />
+    <Compile Include="Packets\C1\UpdateMana.cs" />
     <Compile Include="Packets\C2\MeetPlayer.cs" />
     <Compile Include="Packets\C1\PacketCommon.cs" />
     <Compile Include="Packets\C1\LivingPosition.cs" />
@@ -114,12 +117,15 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="NetworkPreferencesForm.resx">
       <DependentUpon>NetworkPreferencesForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="NetworkPreferencesForm.ru.resx">
       <DependentUpon>NetworkPreferencesForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -132,7 +138,6 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.config" />
-    <None Include="myMu97Bot_TemporaryKey.pfx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
