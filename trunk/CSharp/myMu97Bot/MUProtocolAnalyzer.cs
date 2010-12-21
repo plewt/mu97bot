@@ -46,6 +46,8 @@ namespace DudEeer.myMu97Bot
         public event LivingPositionEventHandler OnLivingPosition;
         public event CharacterListEventHandler OnCharacterList;
         public event GameServerAnswerEventHandler OnGameServerAnswer;
+        public event UpdateHealthEventHandler OnUpdateHealth;
+        public event UpdateManaEventHandler OnUpdateMana;
         #endregion
 
         public States State { get {return stState; } }
@@ -200,6 +202,20 @@ namespace DudEeer.myMu97Bot
                                     {
                                         GameServerAnswer gsaTemp = new GameServerAnswer(aBuffer);
                                         AsyncHelper.FireAndForget(OnGameServerAnswer, gsaTemp);
+                                    }
+                                    break;
+                                case MessageTypeC1.UpdateHealth:
+                                    if (OnUpdateHealth != null)
+                                    {
+                                        UpdateHealth uhTemp = new UpdateHealth(aBuffer);
+                                        AsyncHelper.FireAndForget(OnUpdateHealth, uhTemp);
+                                    }
+                                    break;
+                                case MessageTypeC1.UpdateMana:
+                                    if (OnUpdateMana != null)
+                                    {
+                                        UpdateMana umTemp = new UpdateMana(aBuffer);
+                                        AsyncHelper.FireAndForget(OnUpdateMana, umTemp);
                                     }
                                     break;
                             }
