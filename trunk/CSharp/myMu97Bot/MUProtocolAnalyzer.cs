@@ -64,7 +64,19 @@ namespace DudEeer.myMu97Bot
 		    set { ipServerAddress = IPAddress.Parse(value);}
 	    }
 
-        public MUProtocolAnalyzer(string aServerAddress = "", string aSelfAddress = "")
+        public MUProtocolAnalyzer()
+        {
+            sSelfAddress = "";
+            ipServerAddress = IPAddress.Parse("");
+        }
+
+        public MUProtocolAnalyzer(string aServerAddress)
+        {
+            sSelfAddress = "";
+            ipServerAddress = IPAddress.Parse(aServerAddress);
+        }
+
+        public MUProtocolAnalyzer(string aServerAddress, string aSelfAddress)
         {
             sSelfAddress = aSelfAddress;
             ipServerAddress = IPAddress.Parse(aServerAddress);
