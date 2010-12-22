@@ -156,7 +156,7 @@ Func SetResolution($aWidth = 1024)
 	$crPartyStart[1] = Int(20 * $Multiplier)
 
 	$cMDelta  = Int(80 * $Multiplier)
-	$cMCorner = Int(0.29 * $cMDelta)
+	$cMCorner = -Int(0.29 * $cMDelta)
 
 	$cServerSelectPos[0] = Int(506 * $Multiplier)
 	$cServerSelectPos[1] = Int(364 * $Multiplier)
@@ -710,7 +710,7 @@ Func GoToCoord($aToCoords, $aCanTeleport = 0, $aCenterMouse = True)
 	If ($curCoords[0] == $aToCoords[0]) And ($curCoords[1] == $aToCoords[1]) Then Return
 	Local $prevCurCoords[2] = [-1, -1]
 	Local $multiplier = 1
-	Local $MaxGotoIter = 2 * (Abs($curCoords[0] - $aToCoords[0]) + Abs($curCoords[1] - $aToCoords[1]))
+	Local $MaxGotoIter = (Abs($curCoords[0] - $aToCoords[0]) + Abs($curCoords[1] - $aToCoords[1]))
 	If $MaxGotoIter == 0 Then Return
 	Local $curIter = 0
 	Local $CanTeleport = $aCanTeleport
@@ -795,7 +795,7 @@ Func GoToCoord($aToCoords, $aCanTeleport = 0, $aCenterMouse = True)
 			$curCoords[0] += $AddX
 			$curCoords[1] += $AddY
 		EndIf
-		$curIter += 1
+		$curIter += $AddX + $AddY
 	Until (($curCoords[0] == $aToCoords[0]) And ($curCoords[1] == $aToCoords[1])) Or ($curIter == $MaxGotoIter)
 	if $aCenterMouse Then CenterMouse()
 EndFunc
