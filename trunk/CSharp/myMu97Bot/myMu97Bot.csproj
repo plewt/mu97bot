@@ -37,7 +37,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>\\VMWARE-GAMES-2\ForTests\muBotPublish\bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>true</UseVSHostingProcess>
@@ -66,11 +66,11 @@
   <ItemGroup>
     <Reference Include="PacketDotNet, Version=0.7.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\SharpPcap\SharpPcap-3.4.0\Release\PacketDotNet.dll</HintPath>
+      <HintPath>..\SharpPcap-3.4.0\Release\PacketDotNet.dll</HintPath>
     </Reference>
     <Reference Include="SharpPcap, Version=3.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\SharpPcap\SharpPcap-3.4.0\Release\SharpPcap.dll</HintPath>
+      <HintPath>..\SharpPcap-3.4.0\Release\SharpPcap.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -84,8 +84,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bot\BotCommon.cs" />
     <Compile Include="Common.cs" />
-    <Compile Include="GameObjects\PlayerInfo.cs" />
+    <Compile Include="Game Objects\GameObjectsCommon.cs" />
+    <Compile Include="Game Objects\Living.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -106,7 +108,7 @@
     <Compile Include="Packets\C1\UpdateHealth.cs" />
     <Compile Include="Packets\C1\UpdateMana.cs" />
     <Compile Include="Packets\C2\MeetPlayer.cs" />
-    <Compile Include="Packets\C1\PacketCommon.cs" />
+    <Compile Include="Packets\PacketCommon.cs" />
     <Compile Include="Packets\C1\LivingPosition.cs" />
     <Compile Include="Packets\C1\PublicSpeech.cs" />
     <Compile Include="Packets\C1\PutItem.cs" />
