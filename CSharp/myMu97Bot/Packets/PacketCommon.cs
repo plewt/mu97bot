@@ -62,7 +62,7 @@ namespace DudEeer.myMu97Bot.Packets
         Unknown = -1
     }
 
-    public class CommonServerToClientPacket
+    public class CommonServerToClientPacket : IDisposable
     {
         public PacketClass ClassType { get; set; }
         public int Length { get; set; }
@@ -102,6 +102,10 @@ namespace DudEeer.myMu97Bot.Packets
             if ((this.ClassType == PacketClass.C1) || (this.ClassType == PacketClass.C3))
                 this.Length = aBuffer[1];
             else this.Length = aBuffer[1] * (byte.MaxValue + 1) + aBuffer[2];
+        }
+
+        public void Dispose()
+        {            
         }
     }
 }

@@ -46,5 +46,65 @@ namespace DudEeer.myMu97Bot.Properties {
                 this["ServerIp"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int BotPlayerId {
+            get {
+                return ((int)(this["BotPlayerId"]));
+            }
+            set {
+                this["BotPlayerId"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int BotMaxHealth {
+            get {
+                return ((int)(this["BotMaxHealth"]));
+            }
+            set {
+                this["BotMaxHealth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int BotMaxMana {
+            get {
+                return ((int)(this["BotMaxMana"]));
+            }
+            set {
+                this["BotMaxMana"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int BotMaxStamina {
+            get {
+                return ((int)(this["BotMaxStamina"]));
+            }
+            set {
+                this["BotMaxStamina"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string BotName {
+            get {
+                return ((string)(this["BotName"]));
+            }
+            set {
+                this["BotName"] = value;
+            }
+        }
     }
 }
