@@ -72,7 +72,7 @@ Dim $cmbRect[2][2] = [[825, 694], [825, 766]]
 Dim Const $cmbColors[3]  = [70, 255, 10]
 ; пати
 Dim $crPartyStart[2] = [1000, 20]
-Dim Const $crPartyDeltaY   = 50
+Dim $crPartyDeltaY = 35
 
 ; Типы персонажей
 Dim Const $cctElf = 0
@@ -178,6 +178,8 @@ Func SetResolution($aWidth = 1024)
 	$cDisconnectWindowRect[1] = Int(119 * $Multiplier)
 	$cDisconnectWindowRect[2] = Int(621 * $Multiplier)
 	$cDisconnectWindowRect[3] = Int(134 * $Multiplier)
+
+	$crPartyDeltaY = Int(35 * $Multiplier)
 EndFunc
 
 ;-----------------------------------------------

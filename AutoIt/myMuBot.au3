@@ -175,9 +175,8 @@ EndFunc
 Func DoHeal()
 	If $cCharType == $cctElf Then
 		DoHealBuff(1)
-	Else
-		DrinkHealthPoition()
 	EndIf
+	DrinkHealthPoition()
 EndFunc
 
 ; Лутаем
@@ -251,20 +250,20 @@ EndFunc
 
 ; Проверяем не надо ли слутить
 Func NeedLoot()
-	; Пытаемся слутать под собой (на случай если выпало что-то, или стоим на чужом камне)
-	CenterMouse()
-	Send("{ALT down}")
-	Sleep(100)
-	DoMainClick(200)
-	Sleep(50)
-	Send("{ALT up}")
-	Sleep(200)
-	DoKeyPress("ALT")
-	Const $LootColors[5] = [$calJewelTextColor, $calBlueTextColor, $calGrayTextColor, $calWhiteTextColor, $calOrangeTextColor]
-	Const $LootWords[1] = ["Jewel"]
-	Const $LootWords1[1] = ["Heart"]
-	Const $LootExcludeWords[2] = ["Chaos", "Soldier"]
 	If CounterCheck($ccLoot, $cLootIdleDuration, $cnLoot) Then
+		; Пытаемся слутать под собой (на случай если выпало что-то, или стоим на чужом камне)
+		CenterMouse()
+		Send("{ALT down}")
+		Sleep(100)
+		DoMainClick(200)
+		Sleep(50)
+		Send("{ALT up}")
+		Sleep(200)
+		DoKeyPress("ALT")
+		Const $LootColors[5] = [$calJewelTextColor, $calBlueTextColor, $calGrayTextColor, $calWhiteTextColor, $calOrangeTextColor]
+		Const $LootWords[1] = ["Jewel"]
+		Const $LootWords1[1] = ["Heart"]
+		Const $LootExcludeWords[2] = ["Chaos", "Soldier"]
 		Local $Res = False
 		$Res = FindLootInRect($SearchRect, $calJewelTextSize[0], $calJewelTextSize[1], $calJewelTextColor, $LootCoords, $LootWords, $LootExcludeWords, 5)
 		Return $Res
