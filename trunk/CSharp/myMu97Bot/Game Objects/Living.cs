@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Drawing;
 
 namespace DudEeer.myMu97Bot.Game_Objects
 {
     public class LivingEntity
     {
         public int ID = 0;
-        public GOPoint Position = new GOPoint();
+        public Point Position = new Point();
         public GOMeters Meters = new GOMeters();
     }
 

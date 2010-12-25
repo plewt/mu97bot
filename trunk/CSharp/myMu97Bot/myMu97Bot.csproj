@@ -64,6 +64,9 @@
     <SignManifests>false</SignManifests>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="InputSimulator">
+      <HintPath>..\InputSimulator.0.1.0.0-bin\Release\InputSimulator.dll</HintPath>
+    </Reference>
     <Reference Include="PacketDotNet, Version=0.7.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\SharpPcap-3.4.0\Release\PacketDotNet.dll</HintPath>
@@ -82,6 +85,9 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowScrape">
+      <HintPath>..\WindowScrape\WindowScrape.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bot\BotCommon.cs" />
