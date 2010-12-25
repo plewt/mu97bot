@@ -1,0 +1,9 @@
+#summary 3rd party libraries and code
+#labels Featured
+
+= Список сторонних библиотек =
+ * [http://sourceforge.net/projects/sharppcap/ SharpPcap] - обёртка над WinPcap
+ * [http://www.programmersheaven.com/download/56171/download.aspx WindowScrape] - обёртка для работы с окнами, PInvoke
+ * [http://inputsimulator.codeplex.com/ InputSimulator] - обёртка над SendInput.
+= Заимствованный код = 
+ * [http://bytes.com/topic/c-sharp/answers/259771-asynchronous-event-raising#post1045344 AsyncHelper] - для вызова событий при обработке пакетов
